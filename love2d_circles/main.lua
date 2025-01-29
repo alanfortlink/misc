@@ -1,13 +1,14 @@
 local world
 local objects
 
-local num_circles = 250
-local num_triangles = 250
+local num_circles = 200
+local num_triangles = 5
 local radius = 4
+local triangle_size = 8 * radius
 
 local side = 800
-local min_force = 10
-local max_force = 20
+local min_force = 5
+local max_force = 10
 
 local rotated = function(x, y, rad, center_x, center_y)
   if rad == 0 then
@@ -41,9 +42,11 @@ function love.load()
 
   for _ = 1, num_circles do
     local circle = {}
+    local radius_fac = 1 + 2 * math.random()
+    local circle_radius = radius * radius_fac
     circle.body = love.physics.newBody(world, math.random(0, side), math.random(0, side), "dynamic")
-    circle.shape = love.physics.newCircleShape(radius)
-    circle.fixture = love.physics.newFixture(circle.body, circle.shape, 1)
+    circle.shape = love.physics.newCircleShape(circle_radius)
+    circle.fixture = love.physics.newFixture(circle.body, circle.shape, 0.1 * radius_fac)
     circle.fixture:setRestitution(1.0)
     circle.body:applyForce(
       random_sign() * math.random(min_force, max_force),
@@ -57,9 +60,9 @@ function love.load()
     local triangle = {}
     local center_x, center_y = math.random(0, side), math.random(0, side)
 
-    local x1, y1 = rotated(0, 2 * radius, 2 * math.pi * (0.333), 0, 0)
-    local x2, y2 = rotated(0, 2 * radius, 2 * math.pi * (0.666), 0, 0)
-    local x3, y3 = rotated(0, 2 * radius, 2 * math.pi * (0.999), 0, 0)
+    local x1, y1 = rotated(0, triangle_size, 2 * math.pi * (0.333), 0, 0)
+    local x2, y2 = rotated(0, triangle_size, 2 * math.pi * (0.666), 0, 0)
+    local x3, y3 = rotated(0, triangle_size, 2 * math.pi * (0.999), 0, 0)
 
     triangle.body = love.physics.newBody(world, center_x, center_y, "dynamic")
     triangle.shape = love.physics.newPolygonShape({ x1, y1, x2, y2, x3, y3 })
@@ -88,6 +91,9 @@ end
 
 function love.update(dt)
   world:update(dt)
+  if true then
+    return nil
+  end
   local random_factor = 0.1
   for _, circle in ipairs(objects.circles) do
     -- add randomness
