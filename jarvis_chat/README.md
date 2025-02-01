@@ -19,3 +19,6 @@ OLLAMA_HOST="127.0.0.1:6666" ollama serve
 llama3.2:latest for text
 llava:7b for images
 ```
+
+### DEMO:
+
