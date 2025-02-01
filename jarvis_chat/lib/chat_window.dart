@@ -431,7 +431,6 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                                   ),
                                 ),
                                 Container(
-                                  margin: const EdgeInsets.only(top: 8.0),
                                   child: Row(
                                     mainAxisAlignment: message.isUser
                                         ? MainAxisAlignment.end
