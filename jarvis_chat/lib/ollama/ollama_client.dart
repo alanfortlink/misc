@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:jarvis_chat/chat_window.dart';
 import 'package:jarvis_chat/ollama/ollama_server.dart';
 import 'package:http/http.dart' as http;
@@ -13,11 +14,12 @@ Do not explain too much, unless it is explicitly requested.
 """;
 
 String imageSystem = """
-You are an assistant for a good software engineer.
-You will analyze images and give a short and simple answer.
+You are an assistant that analyses and generates images.
+Your answers should be short and concise.
 """;
 
-typedef OnDataCallback = void Function(String? content, bool done);
+typedef OnDataCallback = void Function(
+    String? content, bool done, List<Uint8List> images);
 
 class OllamaClient {
   final OnDataCallback onData;
@@ -34,15 +36,22 @@ class OllamaClient {
     ChatMessage prompt,
     List<ChatMessage> previousMessages,
   ) async {
+    final isImageRequest =
+        prompt.images.isNotEmpty || prompt.message.startsWith("/img");
+
     final request = http.Request("POST", Uri.parse("http://$textAPI"))
       ..headers["Content-Type"] = "application/json"
       ..body = jsonEncode(
         {
-          "model": prompt.images.isEmpty ? "llama3.2:latest" : "llava:7b",
+          "model": (isImageRequest) ? "llava:7b" : "llama3.2:latest",
           "messages": [
-            null,
+            null, // System message
             ...previousMessages,
-            ChatMessage(prompt.message, true, prompt.images,),
+            ChatMessage(
+              prompt.message,
+              true,
+              prompt.images,
+            ),
           ]
               .map((e) => {
                     'role': e == null
@@ -50,7 +59,9 @@ class OllamaClient {
                         : e.isUser
                             ? 'user'
                             : 'assistant',
-                    'content': e == null ? textSystem : e.message,
+                    'content': e == null
+                        ? (isImageRequest ? imageSystem : textSystem)
+                        : e.message,
                     'images': e == null
                         ? []
                         : e.images.map((e) => base64Encode(e)).toList(),
@@ -71,7 +82,12 @@ class OllamaClient {
       final json = jsonDecode(data) as Map<dynamic, dynamic>;
       final message = json["message"] as Map<dynamic, dynamic>;
       final content = message["content"] as String;
-      onData(content, json["done"]);
+      print(json);
+      final images = (message["images"] ?? [])
+          .map((e) => base64Decode(e as String))
+          .cast<Uint8List>()
+          .toList();
+      onData(content, json["done"], images);
     });
   }
 

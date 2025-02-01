@@ -107,13 +107,13 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
   void initState() {
     super.initState();
 
-    ollamaClient = OllamaClient(onData: (data, done) {
+    ollamaClient = OllamaClient(onData: (data, done, images) {
       if (data == null) {
         return;
       }
       setState(() {
         if (currentMessage == null) {
-          currentMessage = ChatMessage(data, false, []);
+          currentMessage = ChatMessage(data, false, images);
         } else {
           currentMessage!.message = "${currentMessage!.message}$data";
         }
