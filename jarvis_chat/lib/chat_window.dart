@@ -97,7 +97,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
 
   void _scrollOffset(offset) {
     scrollController.animateTo(
-      scrollController.offset + 200,
+      scrollController.offset + offset,
       duration: const Duration(milliseconds: 100),
       curve: Curves.easeOut,
     );
@@ -325,6 +325,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                                     boxShadow: [],
                                   ),
                                   child: md.MarkdownBody(
+                                    softLineBreak: true,
                                     builders: {
                                       "pre": MarkdownCodeBlockBuilder(),
                                     },
