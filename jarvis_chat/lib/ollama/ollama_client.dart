@@ -43,7 +43,7 @@ class OllamaClient {
       ..headers["Content-Type"] = "application/json"
       ..body = jsonEncode(
         {
-          "model": (isImageRequest) ? "llava:7b" : "llama3.2:latest",
+          "model": (isImageRequest) ? "llava:7b" : "codellama:latest",
           "messages": [
             null, // System message
             ...previousMessages,
