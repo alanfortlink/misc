@@ -10,34 +10,9 @@ import 'package:jarvis_chat/ollama/ollama_client.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:window_manager/window_manager.dart';
 
-class PasteContentIntent extends Intent {
-  const PasteContentIntent();
-}
-
-class PasteIntent extends Intent {
-  const PasteIntent();
-}
-
-class ScrollUpIntent extends Intent {
-  const ScrollUpIntent();
-}
-
-class ScrollDownIntent extends Intent {
-  const ScrollDownIntent();
-}
-
-class StopIntent extends Intent {
-  const StopIntent();
-}
-
-class SubmitIntent extends Intent {
-  const SubmitIntent();
-}
-
-class ClearIntent extends Intent {
-  final bool text;
-  final bool images;
-  const ClearIntent({required this.text, required this.images});
+class ShortcutIntent extends Intent {
+  final String id;
+  const ShortcutIntent(this.id);
 }
 
 class ChatImage extends StatelessWidget {
@@ -86,12 +61,8 @@ class ChatMessage {
   ChatMessage(this.message, this.isUser, this.images);
 }
 
-// dark, almost black background color
 const Color backgroundColor = Color(0xFF202020);
-
 const Color ollamaMessageColor = Colors.transparent;
-
-// dark, but can be a little grey
 const Color userMessageColor = Color(0xFF333333);
 
 class ChatWindow extends StatefulWidget {
@@ -124,15 +95,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
     });
   }
 
-  void _scrollUp() {
-    scrollController.animateTo(
-      scrollController.offset - 200,
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.easeOut,
-    );
-  }
-
-  void _scrollDown() {
+  void _scrollOffset(offset) {
     scrollController.animateTo(
       scrollController.offset + 200,
       duration: const Duration(milliseconds: 100),
@@ -184,8 +147,10 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
       return;
     }
 
-    ollamaClient.send(promptController.text, images, pastMessages);
-    pastMessages.add(ChatMessage(promptController.text, true, images));
+    final prompt = ChatMessage(promptController.text, true, images);
+    ollamaClient.send(prompt, pastMessages);
+    pastMessages.add(prompt);
+
     images = [];
     promptController.clear();
     currentMessage = ChatMessage("", false, []);
@@ -263,86 +228,43 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    final shortcuts = {
+      LogicalKeyboardKey.keyS: "stop",
+      LogicalKeyboardKey.keyV: "paste",
+      LogicalKeyboardKey.keyU: "scrollUp",
+      LogicalKeyboardKey.keyD: "scrollDown",
+      LogicalKeyboardKey.keyL: "clearAll",
+      LogicalKeyboardKey.keyC: "clearImages",
+      LogicalKeyboardKey.enter: "submit",
+    };
+
     return Shortcuts(
-      shortcuts: <ShortcutActivator, Intent>{
-        SingleActivator(
-          LogicalKeyboardKey.keyS,
-          meta: true,
-          includeRepeats: true,
-        ): StopIntent(),
-        SingleActivator(
-          LogicalKeyboardKey.keyV,
-          meta: true,
-          includeRepeats: true,
-        ): PasteIntent(),
-        SingleActivator(
-          LogicalKeyboardKey.keyU,
-          meta: true,
-          includeRepeats: true,
-        ): ScrollUpIntent(),
-        SingleActivator(
-          LogicalKeyboardKey.keyD,
-          meta: true,
-          includeRepeats: true,
-        ): ScrollDownIntent(),
-        SingleActivator(
-          LogicalKeyboardKey.enter,
-          meta: true,
-          includeRepeats: true,
-        ): SubmitIntent(),
-        SingleActivator(
-          LogicalKeyboardKey.keyL,
-          meta: true,
-          includeRepeats: true,
-        ): ClearIntent(text: true, images: true),
-        SingleActivator(
-          LogicalKeyboardKey.keyC,
-          meta: true,
-          includeRepeats: true,
-        ): ClearIntent(text: false, images: true),
-      },
+      shortcuts: shortcuts.map(
+        (key, value) => MapEntry(
+          SingleActivator(key, meta: true, includeRepeats: true),
+          ShortcutIntent(value),
+        ),
+      ),
       child: Actions(
         actions: <Type, Action<Intent>>{
-          StopIntent: CallbackAction<StopIntent>(
-            onInvoke: (StopIntent intent) async {
-              _stop();
-              return null;
-            },
-          ),
-          PasteIntent: CallbackAction<PasteIntent>(
-            onInvoke: (PasteIntent intent) async {
-              _handlePaste();
-              return null;
-            },
-          ),
-          SubmitIntent: CallbackAction<SubmitIntent>(
-            onInvoke: (SubmitIntent intent) async {
-              _onPromptSubmitted();
-              return null;
-            },
-          ),
-          ScrollUpIntent: CallbackAction<ScrollUpIntent>(
-            onInvoke: (ScrollUpIntent intent) async {
-              _scrollUp();
-              return null;
-            },
-          ),
-          ScrollDownIntent: CallbackAction<ScrollDownIntent>(
-            onInvoke: (ScrollDownIntent intent) async {
-              _scrollDown();
-              return null;
-            },
-          ),
-          ClearIntent: CallbackAction<ClearIntent>(
-            onInvoke: (ClearIntent intent) async {
-              if (intent.text) {
+          ShortcutIntent: CallbackAction<ShortcutIntent>(
+            onInvoke: (ShortcutIntent intent) async {
+              if (intent.id == "stop") {
+                _stop();
+              } else if (intent.id == "paste") {
+                _handlePaste();
+              } else if (intent.id == "scrollUp") {
+                _scrollOffset(-200);
+              } else if (intent.id == "scrollDown") {
+                _scrollOffset(200);
+              } else if (intent.id == "submit") {
+                _onPromptSubmitted();
+              } else if (intent.id == "clearAll") {
                 pastMessages.clear();
-              }
-
-              if (intent.images) {
+                images.clear();
+              } else if (intent.id == "clearImages") {
                 images.clear();
               }
-
               setState(() {});
               return null;
             },

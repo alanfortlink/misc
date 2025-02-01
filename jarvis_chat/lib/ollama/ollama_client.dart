@@ -1,8 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
-import 'dart:typed_data';
-
 import 'package:jarvis_chat/chat_window.dart';
 import 'package:jarvis_chat/ollama/ollama_server.dart';
 import 'package:http/http.dart' as http;
@@ -34,35 +31,31 @@ class OllamaClient {
   OllamaClient({required this.onData});
 
   Future<void> send(
-    String prompt,
-    List<Uint8List> images,
+    ChatMessage prompt,
     List<ChatMessage> previousMessages,
   ) async {
-    // final messagesStr = [...previousMessages, ChatMessage(prompt, true, images)]
-    //     .map((e) => "${e.isUser ? 'User' : 'Assistant'}: ${e.message}")
-    //     .join("\n\n");
-
     final request = http.Request("POST", Uri.parse("http://$textAPI"))
       ..headers["Content-Type"] = "application/json"
       ..body = jsonEncode(
         {
-          "model": images.isEmpty ? "llama3.2:latest" : "llava:7b",
-          "messages":
-              [null, ...previousMessages, ChatMessage(prompt, true, images)]
-                  .map((e) => {
-                        'role': e == null
-                            ? 'system'
-                            : e.isUser
-                                ? 'user'
-                                : 'assistant',
-                        'content': e == null ? textSystem : e.message,
-                        'images': e == null
-                            ? []
-                            : e.images.map((e) => base64Encode(e)).toList(),
-                      })
-                  .toList(),
-          // "system": images.isEmpty ? textSystem : imageSystem,
-          // "images": images.map((e) => base64Encode(e)).toList(),
+          "model": prompt.images.isEmpty ? "llama3.2:latest" : "llava:7b",
+          "messages": [
+            null,
+            ...previousMessages,
+            ChatMessage(prompt.message, true, prompt.images,),
+          ]
+              .map((e) => {
+                    'role': e == null
+                        ? 'system'
+                        : e.isUser
+                            ? 'user'
+                            : 'assistant',
+                    'content': e == null ? textSystem : e.message,
+                    'images': e == null
+                        ? []
+                        : e.images.map((e) => base64Encode(e)).toList(),
+                  })
+              .toList(),
           "options": {
             "temperature": 0.6,
           },
