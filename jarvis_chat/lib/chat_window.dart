@@ -286,7 +286,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                         ? pastMessages[index]
                         : ChatMessage(
                             (currentMessage!.message.trim().isEmpty)
-                                ? "..."
+                                ? ""
                                 : currentMessage!.message,
                             false,
                             [],
@@ -324,34 +324,48 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                                     borderRadius: BorderRadius.circular(8.0),
                                     boxShadow: [],
                                   ),
-                                  child: md.MarkdownBody(
-                                    softLineBreak: true,
-                                    builders: {
-                                      "pre": MarkdownCodeBlockBuilder(),
-                                    },
-                                    fitContent: message.isUser,
-                                    selectable: true,
-                                    data: message.message,
-                                    styleSheet: md.MarkdownStyleSheet(
-                                      codeblockPadding:
-                                          const EdgeInsets.all(12.0),
-                                      blockquoteDecoration: BoxDecoration(
-                                        color: backgroundColor.darken(0.5),
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                        border: Border.all(
-                                          color: Colors.white
-                                              .withValues(alpha: 0.1),
-                                          width: 1.0,
+                                  child: (message.message.trim().isEmpty)
+                                      ? Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Container(
+                                            width: 24.0,
+                                            height: 24.0,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white.withValues(
+                                                alpha: 0.5,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : md.MarkdownBody(
+                                          softLineBreak: true,
+                                          builders: {
+                                            "pre": MarkdownCodeBlockBuilder(),
+                                          },
+                                          fitContent: message.isUser,
+                                          selectable: true,
+                                          data: message.message,
+                                          styleSheet: md.MarkdownStyleSheet(
+                                            codeblockPadding:
+                                                const EdgeInsets.all(12.0),
+                                            blockquoteDecoration: BoxDecoration(
+                                              color:
+                                                  backgroundColor.darken(0.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              border: Border.all(
+                                                color: Colors.white
+                                                    .withValues(alpha: 0.1),
+                                                width: 1.0,
+                                              ),
+                                            ),
+                                            p: TextStyle(
+                                              color: message.isUser
+                                                  ? Colors.white
+                                                  : Colors.white,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      p: TextStyle(
-                                        color: message.isUser
-                                            ? Colors.white
-                                            : Colors.white,
-                                      ),
-                                    ),
-                                  ),
                                 ),
                                 Container(
                                   child: Row(

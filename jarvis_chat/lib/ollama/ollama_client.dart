@@ -81,12 +81,23 @@ class OllamaClient {
     currentResponse = response.stream.transform(utf8.decoder).listen((data) {
       final json = jsonDecode(data) as Map<dynamic, dynamic>;
       final message = json["message"] as Map<dynamic, dynamic>;
-      final content = message["content"] as String;
-      print(json);
+      String content = message["content"] as String;
       final images = (message["images"] ?? [])
           .map((e) => base64Decode(e as String))
           .cast<Uint8List>()
           .toList();
+
+      if (json["model"].toString().contains("deepseek")) {
+        final endOfThinkingToken = "</think>";
+        if (!hasFinishedThinking) {
+          if (content.contains(endOfThinkingToken)) {
+            hasFinishedThinking = true;
+            content = content.split(endOfThinkingToken).last;
+          } else {
+            return;
+          }
+        }
+      }
       onData(content, json["done"], images);
     });
   }
