@@ -28,11 +28,11 @@ class ChatImage extends StatelessWidget {
         aspectRatio: 1.0,
         child: Container(
           padding: const EdgeInsets.all(4.0),
-          margin: const EdgeInsets.only(right: 8.0),
+          margin: const EdgeInsets.only(top: 4.0, left: 4.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Colors.grey[700]!.withValues(alpha: 0.5),
               width: 1.0,
             ),
             boxShadow: [
