@@ -25,30 +25,44 @@ class ChatImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100.0,
-      child: AspectRatio(
-        aspectRatio: 1.0,
-        child: Container(
-          padding: const EdgeInsets.all(4.0),
-          margin: const EdgeInsets.only(top: 4.0, left: 4.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(
-              color: Colors.grey[700]!.withValues(alpha: 0.5),
-              width: 1.0,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
-                blurRadius: 4.0,
-                offset: const Offset(0, 4),
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              child: Image.memory(bytes),
+            );
+          },
+        );
+      },
+      child: SizedBox(
+        height: 80.0,
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: Container(
+            margin: const EdgeInsets.all(2.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(
+                color: Colors.grey[700]!.withValues(alpha: 0.5),
+                width: 1.0,
               ),
-            ],
-          ),
-          child: Image.memory(
-            bytes,
-            fit: BoxFit.cover,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  blurRadius: 4.0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.memory(
+                bytes,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
       ),
@@ -410,9 +424,53 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.only(left: 16.0),
-                child: Row(
-                  children: images.map((bytes) => ChatImage(bytes)).toList(),
+                width: double.infinity,
+                margin: const EdgeInsets.only(left: 16.0, right: 16.0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: images
+                        .map(
+                          (bytes) => Container(
+                            color: Colors.transparent,
+                            margin: const EdgeInsets.all(4.0),
+                            child: Center(
+                              child: Stack(
+                                children: [
+                                  ChatImage(bytes),
+                                  Positioned(
+                                    top: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(2.0),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Colors.black.withValues(alpha: 0.5),
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(8.0),
+                                        ),
+                                      ),
+                                      child: InkWell(
+                                        onTap: () {
+                                          images.remove(bytes);
+                                          setState(() {});
+                                        },
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 16.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
               ),
               Container(
