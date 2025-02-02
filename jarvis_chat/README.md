@@ -7,6 +7,13 @@ tray_manager: ayatana-appindicator3-0.1 or appindicator3-0.1
 hotkey_manager: keybinder-3.0
 ```
 
+
+### MacOS
+
+There's a build for MacOS in [./installer/macos_dmg/](./installer/macos_dmg/).
+
+
+
 ### SHORTCUTS:
 
 `Command + Shift + ,`: Open settings
