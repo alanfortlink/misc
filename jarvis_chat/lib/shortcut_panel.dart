@@ -15,6 +15,7 @@ class ShortcutPanel extends StatelessWidget {
     ShortcutInfo("Command + V", "Paste content"),
     ShortcutInfo("Command + L", "Clear messages"),
     ShortcutInfo("Command + C", "Clear attachments"),
+    ShortcutInfo("Command + ;", "Toggle message details"),
     ShortcutInfo("Command + U", "Scroll up"),
     ShortcutInfo("Command + D", "Scroll down"),
     ShortcutInfo("Command + S", "Stop current response"),

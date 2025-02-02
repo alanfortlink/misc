@@ -105,8 +105,9 @@ class ChatMessage {
   String message;
   bool isUser;
   List<Uint8List> images;
+  String model;
 
-  ChatMessage(this.message, this.isUser, this.images);
+  ChatMessage(this.message, this.isUser, this.images, this.model);
 }
 
 const Color backgroundColor = Color(0xFF202020);
@@ -155,15 +156,17 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
   void initState() {
     super.initState();
 
-    ollamaClient = OllamaClient(onData: (data, done, images) {
+    ollamaClient = OllamaClient(onData: (data, done, images, model) {
       if (data == null) {
         return;
       }
       setState(() {
         if (currentMessage == null) {
-          currentMessage = ChatMessage(data, false, images);
+          currentMessage = ChatMessage(data, false, images, model);
         } else {
           currentMessage!.message = "${currentMessage!.message}$data";
+          currentMessage!.images.addAll(images);
+          currentMessage!.model = model;
         }
 
         if (done) {
@@ -199,13 +202,13 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
       return;
     }
 
-    final prompt = ChatMessage(promptController.text, true, images);
+    final prompt = ChatMessage(promptController.text, true, images, "user");
     ollamaClient.send(prompt, pastMessages, store);
     pastMessages.add(prompt);
 
     images = [];
     promptController.clear();
-    currentMessage = ChatMessage("", false, []);
+    currentMessage = ChatMessage("", false, [], "");
     _scroll();
     setState(() {});
   }
@@ -293,6 +296,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
       LogicalKeyboardKey.keyC: "clearImages",
       LogicalKeyboardKey.enter: "submit",
       LogicalKeyboardKey.comma: "settings",
+      LogicalKeyboardKey.semicolon: "toggleDetails",
     };
 
     return Shortcuts(
@@ -320,6 +324,12 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                 pastMessages.clear();
                 images.clear();
               } else if (intent.id == "clearImages") {
+                images.clear();
+              } else if (intent.id == "toggleDetails") {
+                store.detailsEnabled = !store.detailsEnabled;
+                if (store.detailsEnabled) {
+                  _scroll();
+                }
                 images.clear();
               } else if (intent.id == "settings") {
                 Navigator.of(context).push(
@@ -360,6 +370,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                                     : currentMessage!.message,
                                 false,
                                 [],
+                                "",
                               );
                         return Container(
                           padding: const EdgeInsets.all(4.0),
@@ -454,6 +465,29 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                                             .toList(),
                                       ),
                                     ),
+                                    if (!message.isUser && store.detailsEnabled)
+                                      Align(
+                                        alignment: Alignment.bottomLeft,
+                                        child: Container(
+                                          margin: const EdgeInsets.only(
+                                            left: 8.0,
+                                          ),
+                                          child: Text(
+                                            message.model,
+                                            style: TextStyle(
+                                              color: Colors.white.withValues(
+                                                alpha: 0.4,
+                                              ),
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 8.0,
+                                            ),
+                                          ),
+                                        ).animate().scale(
+                                            duration: const Duration(
+                                                milliseconds: 100),
+                                            curve: Curves.easeOut,
+                                          ),
+                                      ),
                                   ],
                                 ),
                               ),

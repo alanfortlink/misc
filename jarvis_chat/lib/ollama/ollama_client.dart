@@ -17,7 +17,11 @@ Your answers should be short and concise.
 """;
 
 typedef OnDataCallback = void Function(
-    String? content, bool done, List<Uint8List> images);
+  String? content,
+  bool done,
+  List<Uint8List> images,
+  String model,
+);
 
 class OllamaClient {
   final OnDataCallback onData;
@@ -44,7 +48,7 @@ class OllamaClient {
       ..headers["Content-Type"] = "application/json"
       ..body = jsonEncode(
         {
-          "model": (isImageRequest) ? "llava:7b" : "codellama:latest",
+          "model": (isImageRequest) ? store.imageModel : store.textModel,
           "messages": [
             null, // System message
             ...previousMessages,
@@ -52,6 +56,7 @@ class OllamaClient {
               prompt.message,
               true,
               prompt.images,
+              "user",
             ),
           ]
               .map((e) => {
@@ -81,6 +86,7 @@ class OllamaClient {
     hasFinishedThinking = false;
     currentResponse = response.stream.transform(utf8.decoder).listen((data) {
       final json = jsonDecode(data) as Map<dynamic, dynamic>;
+      final model = json["model"] as String;
       final message = json["message"] as Map<dynamic, dynamic>;
       String content = message["content"] as String;
       final images = (message["images"] ?? [])
@@ -99,7 +105,7 @@ class OllamaClient {
       //     }
       //   }
       // }
-      onData(content, json["done"], images);
+      onData(content, json["done"], images, model);
     });
   }
 

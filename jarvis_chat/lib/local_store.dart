@@ -55,6 +55,12 @@ class LocalStore extends ChangeNotifier {
     _prefs.setInt("lastHeight", value);
   }
 
+  bool get detailsEnabled => _prefs.getBool("detailsEnabled") ?? false;
+  set detailsEnabled(bool value) {
+    _prefs.setBool("detailsEnabled", value);
+    notifyListeners(triggerCheck: false);
+  }
+
   String get address => _prefs.getString("address")!;
   String get port => _prefs.getString("port")!;
   String get textModel => _prefs.getString("textModel")!;
