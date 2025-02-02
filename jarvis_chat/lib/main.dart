@@ -10,7 +10,7 @@ Future<void> main(List<String> args) async {
   await windowManager.ensureInitialized();
   WindowOptions windowOptions = WindowOptions(
     size: Size(800, 900),
-    center: true,
+    center: false,
     backgroundColor: Colors.transparent,
     skipTaskbar: true,
     titleBarStyle: TitleBarStyle.hidden,
@@ -19,7 +19,6 @@ Future<void> main(List<String> args) async {
 
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
-    await windowManager.focus();
   });
 
   await trayManager.setIcon("assets/images/icon.png");

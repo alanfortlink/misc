@@ -9,6 +9,7 @@ import 'package:flutter_markdown/flutter_markdown.dart' as md;
 import 'package:jarvis_chat/local_store.dart';
 import 'package:jarvis_chat/ollama/ollama_client.dart';
 import 'package:jarvis_chat/settings_window.dart';
+import 'package:jarvis_chat/shortcut_panel.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -314,113 +315,141 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount:
-                      pastMessages.length + (currentMessage == null ? 0 : 1),
-                  itemBuilder: (context, index) {
-                    final message = index < pastMessages.length
-                        ? pastMessages[index]
-                        : ChatMessage(
-                            (currentMessage!.message.trim().isEmpty)
-                                ? ""
-                                : currentMessage!.message,
-                            false,
-                            [],
-                          );
-                    return Container(
-                      padding: const EdgeInsets.all(4.0),
-                      margin: const EdgeInsets.all(4.0),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: message.isUser
-                              ? BorderSide.none
-                              : BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.1),
-                                  width: 1.0,
-                                ),
-                        ),
-                      ),
-                      child: ListTile(
-                        title: Align(
-                          alignment: message.isUser
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft,
-                          child: Container(
-                            margin:
-                                const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8.0),
-                                  decoration: BoxDecoration(
-                                    color: message.isUser
-                                        ? userMessageColor
-                                        : ollamaMessageColor,
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    boxShadow: [],
-                                  ),
-                                  child: (message.message.trim().isEmpty)
-                                      ? Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: Container(
-                                            width: 24.0,
-                                            height: 24.0,
-                                            child: CircularProgressIndicator(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.5,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : md.MarkdownBody(
-                                          softLineBreak: true,
-                                          builders: {
-                                            "pre": MarkdownCodeBlockBuilder(),
-                                          },
-                                          fitContent: message.isUser,
-                                          selectable: true,
-                                          data: message.message,
-                                          styleSheet: md.MarkdownStyleSheet(
-                                            codeblockPadding:
-                                                const EdgeInsets.all(12.0),
-                                            blockquoteDecoration: BoxDecoration(
-                                              color:
-                                                  backgroundColor.darken(0.5),
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              border: Border.all(
-                                                color: Colors.white
-                                                    .withValues(alpha: 0.1),
-                                                width: 1.0,
-                                              ),
-                                            ),
-                                            p: TextStyle(
-                                              color: message.isUser
-                                                  ? Colors.white
-                                                  : Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                ),
-                                Container(
-                                  child: Row(
-                                    mainAxisAlignment: message.isUser
-                                        ? MainAxisAlignment.end
-                                        : MainAxisAlignment.start,
-                                    children: message.images
-                                        .map((bytes) => ChatImage(bytes))
-                                        .toList(),
-                                  ),
-                                ),
-                              ],
+                child: Stack(
+                  children: [
+                    ListView.builder(
+                      controller: scrollController,
+                      itemCount: pastMessages.length +
+                          (currentMessage == null ? 0 : 1),
+                      itemBuilder: (context, index) {
+                        final message = index < pastMessages.length
+                            ? pastMessages[index]
+                            : ChatMessage(
+                                (currentMessage!.message.trim().isEmpty)
+                                    ? ""
+                                    : currentMessage!.message,
+                                false,
+                                [],
+                              );
+                        return Container(
+                          padding: const EdgeInsets.all(4.0),
+                          margin: const EdgeInsets.all(4.0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: message.isUser
+                                  ? BorderSide.none
+                                  : BorderSide(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.1),
+                                      width: 1.0,
+                                    ),
                             ),
                           ),
+                          child: ListTile(
+                            title: Align(
+                              alignment: message.isUser
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                    top: 8.0, bottom: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8.0),
+                                      decoration: BoxDecoration(
+                                        color: message.isUser
+                                            ? userMessageColor
+                                            : ollamaMessageColor,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        boxShadow: [],
+                                      ),
+                                      child: (message.message.trim().isEmpty)
+                                          ? Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                width: 24.0,
+                                                height: 24.0,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color:
+                                                      Colors.white.withValues(
+                                                    alpha: 0.5,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          : md.MarkdownBody(
+                                              softLineBreak: true,
+                                              builders: {
+                                                "pre":
+                                                    MarkdownCodeBlockBuilder(),
+                                              },
+                                              fitContent: message.isUser,
+                                              selectable: true,
+                                              data: message.message,
+                                              styleSheet: md.MarkdownStyleSheet(
+                                                codeblockPadding:
+                                                    const EdgeInsets.all(12.0),
+                                                blockquoteDecoration:
+                                                    BoxDecoration(
+                                                  color: backgroundColor
+                                                      .darken(0.5),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
+                                                  border: Border.all(
+                                                    color: Colors.white
+                                                        .withValues(alpha: 0.1),
+                                                    width: 1.0,
+                                                  ),
+                                                ),
+                                                p: TextStyle(
+                                                  color: message.isUser
+                                                      ? Colors.white
+                                                      : Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                    Container(
+                                      child: Row(
+                                        mainAxisAlignment: message.isUser
+                                            ? MainAxisAlignment.end
+                                            : MainAxisAlignment.start,
+                                        children: message.images
+                                            .map((bytes) => ChatImage(bytes))
+                                            .toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    if (pastMessages.isEmpty)
+                      Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "No Messages Yet",
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.4),
+                                fontSize: 16.0,
+                              ),
+                            ),
+                            const SizedBox(height: 16.0),
+                            ShortcutPanel(),
+                          ],
                         ),
                       ),
-                    );
-                  },
+                  ],
                 ),
               ),
               Container(

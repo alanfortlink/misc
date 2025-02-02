@@ -34,6 +34,17 @@ class LocalStore extends ChangeNotifier {
     checkConnection();
   }
 
+  int get lastX => _prefs.getInt("lastX") ?? 0;
+  int get lastY => _prefs.getInt("lastY") ?? 0;
+
+  set lastX(int value) {
+    _prefs.setInt("lastX", value);
+  }
+
+  set lastY(int value) {
+    _prefs.setInt("lastY", value);
+  }
+
   String get address => _prefs.getString("address")!;
   String get port => _prefs.getString("port")!;
   String get textModel => _prefs.getString("textModel")!;
