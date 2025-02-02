@@ -10,11 +10,11 @@
 		</data>
 		<key>Resources/flutter_assets/AssetManifest.bin</key>
 		<data>
-		XZOSgnW2DO4lNPZLpcT7eT/UZig=
+		a9q2wAhm2/ZozEpVo0xbfGgvHiw=
 		</data>
 		<key>Resources/flutter_assets/AssetManifest.json</key>
 		<data>
-		l6QwaEtCMANyGGEl0YxO2fYHhmQ=
+		C6E0px+R9K/TIWPM4bFZhaXYfoM=
 		</data>
 		<key>Resources/flutter_assets/FontManifest.json</key>
 		<data>
@@ -22,7 +22,7 @@
 		</data>
 		<key>Resources/flutter_assets/NOTICES.Z</key>
 		<data>
-		NY83Gn04zkJbOaIenxILn887ETg=
+		IpcEoatJ1LRArlfx4xVlkGzBARc=
 		</data>
 		<key>Resources/flutter_assets/assets/images/icon.png</key>
 		<data>
@@ -39,6 +39,42 @@
 		<key>Resources/flutter_assets/packages/line_icons/lib/assets/fonts/LineIcons.ttf</key>
 		<data>
 		iQ3YhhHoHJIPP/rP39uhezq2580=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/dart.json</key>
+		<data>
+		AGePr3zpBO1mH8y7VVD28PJk5hY=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/json.json</key>
+		<data>
+		LstvLmC8U2l++bgIhJwrnJpjQAQ=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/serverpod_protocol.json</key>
+		<data>
+		IeZIIYEB3Uq5LLN3VNZFcGchAYE=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/sql.json</key>
+		<data>
+		Jqlc3WrL/LLEB2opbUF0MP4GRq0=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/yaml.json</key>
+		<data>
+		BLlPYmafmGKuztCSBXIOTwtVgt4=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/themes/dark_plus.json</key>
+		<data>
+		BhP0uRS86Z1KNOXTsyppXzcqFpU=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/themes/dark_vs.json</key>
+		<data>
+		4QT8hhqKqmTYSbNX4rbCVteQdhA=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/themes/light_plus.json</key>
+		<data>
+		sCs8eDPrpsa4uUsV2j0dLqrMiEU=
+		</data>
+		<key>Resources/flutter_assets/packages/syntax_highlight/themes/light_vs.json</key>
+		<data>
+		b4rq8SBuVHMnuv3MtKsFZQFWzKs=
 		</data>
 		<key>Resources/flutter_assets/shaders/ink_sparkle.frag</key>
 		<data>
@@ -58,14 +94,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			737LGJw8/JD1eQpq48rF07j8oDNoJNr6GFO3PRm7gdE=
+			3VmDZ2K2L5u/VPooyM1cBvoYg5HFt+i7mQFKMtUMwaU=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/AssetManifest.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			UNYugYnBEUE4ZrtES69MD2WoTtUXHx049zBNLb+Hz4E=
+			ogQ3Xy0ghFit1FjjPkCzIJAbK1jS7yjpx9WKP1SZfoM=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/FontManifest.json</key>
@@ -79,7 +115,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			mt3q8yWmnzSzR6zqgUeCBJFUR3M/hMx6TztQeSoeVmE=
+			F/5nSyloWco81nxrxPoLX8IosAlnwC9rCYlDTGNDZSk=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/assets/images/icon.png</key>
@@ -108,6 +144,69 @@
 			<key>hash2</key>
 			<data>
 			K6qjYvnMgtsV+xowQDHMgYXM0hxd82fIVnwbJ5lcNTA=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/dart.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			1iNMxJIc6EzYYTE1OQg7X03B8ZZh6OaWn6f+A0Ol+n8=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/json.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Z1mH7APgkIptBaaX6idvVjJBtaSsnLQ4XZZLcMg3Zuw=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/serverpod_protocol.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			dTO/FjdSpqgtLrE/SBPQ66FeqEIv1PZaXuJlO/YC76k=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/sql.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			+qxKc790AwnKHjscBLtrAfpDKExx2ttV851piIw+eqc=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/grammars/yaml.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			EDzkB6wUWqyXZOnDi7U7F4+nO9T4vP2XY+L+fpaqovI=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/themes/dark_plus.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			lutrnFdrunnSulBG20Dk8MDtU530tTy1jHazmYeW4x8=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/themes/dark_vs.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			UqTI4SGUt8Z3mAXHeZMapgOvujWi3nEDEJzyARhlkKw=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/themes/light_plus.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			v7ErQkvq4xkee1Cj4aiBUat+bGqAsJXBCxKNKITSwT4=
+			</data>
+		</dict>
+		<key>Resources/flutter_assets/packages/syntax_highlight/themes/light_vs.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			zRqL+3E9DeSQ9zeYPuwfK0VnpV9UdqoqIEST1Qd0Ru8=
 			</data>
 		</dict>
 		<key>Resources/flutter_assets/shaders/ink_sparkle.frag</key>

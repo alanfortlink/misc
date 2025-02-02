@@ -10,8 +10,11 @@ hotkey_manager: keybinder-3.0
 ### SHORTCUTS:
 
 `Command + Shift + ,`: Open settings
+
 `Command + Shift + U`: Scroll Up
+
 `Command + Shift + D`: Scroll Down
+
 `Command + Shift + Enter`: Submit prompt
 
 ### MODELS:
