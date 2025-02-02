@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
@@ -19,12 +21,20 @@ class MainWindow extends StatefulWidget {
 
 class _MainWindowState extends State<MainWindow>
     with TrayListener, WindowListener {
+  void _showWindow() async {
+    await windowManager.show();
+    await windowManager.focus();
+  }
+
+  void _hideWindow() async {
+    await windowManager.hide();
+  }
+
   void _toggle() async {
     if (await windowManager.isVisible()) {
-      await windowManager.hide();
+      _hideWindow();
     } else {
-      await windowManager.show();
-      await windowManager.focus();
+      _showWindow();
     }
   }
 
@@ -65,12 +75,20 @@ class _MainWindowState extends State<MainWindow>
   }
 
   @override
-  void onTrayIconMouseDown() async {}
+  void onTrayIconMouseDown() async {
+    trayManager.popUpContextMenu();
+  }
 
   @override
   void onTrayMenuItemClick(MenuItem menuItem) async {
-    if (menuItem.key == "show_window") {
-    } else if (menuItem.key == "exit_app") {}
+    if (menuItem.key == "open_chat") {
+      _showWindow();
+    } else if (menuItem.key == "quit") {
+      await windowManager.close();
+      exit(0);
+    } else if (menuItem.key == "hide_chat") {
+      _hideWindow();
+    }
 
     super.onTrayMenuItemClick(menuItem);
   }

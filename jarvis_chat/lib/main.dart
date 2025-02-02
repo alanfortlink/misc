@@ -21,7 +21,7 @@ Future<void> main(List<String> args) async {
     backgroundColor: Colors.transparent,
     skipTaskbar: true,
     titleBarStyle: TitleBarStyle.hidden,
-    windowButtonVisibility: false,
+    // windowButtonVisibility: false,
   );
 
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
@@ -35,6 +35,25 @@ Future<void> main(List<String> args) async {
   });
 
   await trayManager.setIcon("assets/images/icon.png");
+
+  await trayManager.setContextMenu(Menu(items: [
+    MenuItem(
+      key: "open_chat",
+      toolTip: "Open Chat",
+      label: "Open Chat",
+    ),
+    MenuItem(
+      key: "hide_chat",
+      toolTip: "Hide Chat",
+      label: "Hide Chat",
+    ),
+    MenuItem(
+      key: "quit",
+      toolTip: "Quit",
+      label: "Quit",
+    ),
+  ]));
+
   await hotKeyManager.unregisterAll();
 
   runApp(MainWindow(store: store));

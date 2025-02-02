@@ -77,15 +77,13 @@ class _SettingsWindowState extends State<SettingsWindow> {
           ),
         },
         child: Scaffold(
-          appBar: AppBar(
-            title: const Text("Settings"),
-          ),
           body: Container(
             margin: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                SizedBox(height: 20),
                 TextField(
                   controller: _serverAddressController,
                   decoration: const InputDecoration(
