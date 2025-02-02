@@ -84,6 +84,36 @@ class _SettingsWindowState extends State<SettingsWindow> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(height: 20),
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Settings",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  height: 1,
+                  color: Colors.grey,
+                ),
+                SizedBox(height: 20),
+                // back button
+
                 TextField(
                   controller: _serverAddressController,
                   decoration: const InputDecoration(
