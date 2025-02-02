@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -335,7 +336,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
               } else if (intent.id == "toggleDetails") {
                 store.detailsEnabled = !store.detailsEnabled;
                 if (store.detailsEnabled) {
-                  _scroll();
+                  _scrollOffset(30);
                 }
                 images.clear();
               } else if (intent.id == "settings") {
