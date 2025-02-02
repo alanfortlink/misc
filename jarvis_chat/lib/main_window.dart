@@ -112,11 +112,13 @@ class _MainWindowState extends State<MainWindow>
         ),
         useMaterial3: true,
       ),
-      home: CommandWCloser(
-        child: Scaffold(
-          body: ChangeNotifierProvider<LocalStore>.value(
-            value: widget.store,
-            child: ChatWindow(),
+      home: SelectionArea(
+        child: CommandWCloser(
+          child: Scaffold(
+            body: ChangeNotifierProvider<LocalStore>.value(
+              value: widget.store,
+              child: ChatWindow(),
+            ),
           ),
         ),
       ),

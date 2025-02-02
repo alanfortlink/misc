@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:jarvis_chat/local_store.dart';
 import 'package:jarvis_chat/main_window.dart';
+import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -10,6 +11,8 @@ Future<void> main(List<String> args) async {
 
   late final LocalStore store = LocalStore();
   await store.init();
+
+  await Highlighter.initialize(['dart', 'yaml', 'sql']);
 
   await windowManager.ensureInitialized();
   WindowOptions windowOptions = WindowOptions(

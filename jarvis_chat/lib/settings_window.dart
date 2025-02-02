@@ -76,102 +76,106 @@ class _SettingsWindowState extends State<SettingsWindow> {
             },
           ),
         },
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: backgroundColor,
-            title: const Text("Settings"),
-          ),
-          body: Container(
-            padding: const EdgeInsets.all(16),
-            color: backgroundColor,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _serverAddressController,
-                  decoration: const InputDecoration(
-                    labelText: "Server Address",
+        child: SelectionArea(
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: backgroundColor,
+              title: const Text("Settings"),
+            ),
+            body: Container(
+              padding: const EdgeInsets.all(16),
+              color: backgroundColor,
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _serverAddressController,
+                    decoration: const InputDecoration(
+                      labelText: "Server Address",
+                    ),
+                    onSubmitted: (value) {
+                      store.address = value;
+                    },
                   ),
-                  onSubmitted: (value) {
-                    store.address = value;
-                  },
-                ),
-                TextField(
-                  controller: _serverPortController,
-                  decoration: const InputDecoration(
-                    labelText: "Server Port",
+                  TextField(
+                    controller: _serverPortController,
+                    decoration: const InputDecoration(
+                      labelText: "Server Port",
+                    ),
+                    onSubmitted: (value) {
+                      store.port = value;
+                    },
                   ),
-                  onSubmitted: (value) {
-                    store.port = value;
-                  },
-                ),
-                TextField(
-                  controller: _textModelController,
-                  decoration: const InputDecoration(
-                    labelText: "Text Model",
+                  TextField(
+                    controller: _textModelController,
+                    decoration: const InputDecoration(
+                      labelText: "Text Model",
+                    ),
+                    onSubmitted: (value) {
+                      store.textModel = value;
+                    },
                   ),
-                  onSubmitted: (value) {
-                    store.textModel = value;
-                  },
-                ),
-                TextField(
-                  controller: _imageModelController,
-                  decoration: const InputDecoration(
-                    labelText: "Image Model",
+                  TextField(
+                    controller: _imageModelController,
+                    decoration: const InputDecoration(
+                      labelText: "Image Model",
+                    ),
+                    onSubmitted: (value) {
+                      store.imageModel = value;
+                    },
                   ),
-                  onSubmitted: (value) {
-                    store.imageModel = value;
-                  },
-                ),
-                Text(
-                  "Connection Status: ${store.isServerUp ? "Up" : "Down"}",
-                ),
-                Text("Address: ${store.address}"),
-                Text("Port: ${store.port}"),
-                Text("Text Model: ${store.textModel}"),
-                Text("Image Model: ${store.imageModel}"),
-                Divider(height: 5),
-                Text("Local Models:"),
-                Expanded(
-                  child: Container(
-                    child: ListView.builder(
-                      itemCount: store.models.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(store.models[index]),
-                          trailing: Container(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.copy),
-                                  onPressed: () {
-                                    Clipboard.setData(
-                                      ClipboardData(text: store.models[index]),
-                                    );
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("Copied to clipboard"),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(LineIcons.check),
-                                  onPressed: () {
-                                    store.textModel = store.models[index];
-                                  },
-                                ),
-                              ],
+                  Text(
+                    "Connection Status: ${store.isServerUp ? "Up" : "Down"}",
+                  ),
+                  Text("Address: ${store.address}"),
+                  Text("Port: ${store.port}"),
+                  Text("Text Model: ${store.textModel}"),
+                  Text("Image Model: ${store.imageModel}"),
+                  Divider(height: 5),
+                  Text("Local Models:"),
+                  Expanded(
+                    child: Container(
+                      child: ListView.builder(
+                        itemCount: store.models.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(store.models[index]),
+                            trailing: Container(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.copy),
+                                    onPressed: () {
+                                      Clipboard.setData(
+                                        ClipboardData(
+                                            text: store.models[index]),
+                                      );
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Copied to clipboard"),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(LineIcons.check),
+                                    onPressed: () {
+                                      store.textModel = store.models[index];
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

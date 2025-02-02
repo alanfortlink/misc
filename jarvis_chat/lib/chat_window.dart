@@ -13,6 +13,7 @@ import 'package:jarvis_chat/settings_window.dart';
 import 'package:jarvis_chat/shortcut_panel.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:provider/provider.dart';
+import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:window_manager/window_manager.dart';
 
 class ShortcutIntent extends Intent {
@@ -133,6 +134,9 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
   ChatMessage? currentMessage;
   List<Uint8List> images = [];
   String oldText = "";
+  final MarkdownCodeBlockBuilder _markdownCodeBlockBuilder =
+      MarkdownCodeBlockBuilder();
+  late final Highlighter highlighter;
 
   void _scroll() {
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -182,6 +186,9 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
   }
 
   void _init() async {
+    final theme = await HighlighterTheme.loadDarkTheme();
+    highlighter = Highlighter(language: 'dart', theme: theme);
+    await _markdownCodeBlockBuilder.init(highlighter);
     setState(() {});
   }
 
@@ -426,7 +433,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                                               softLineBreak: true,
                                               builders: {
                                                 "pre":
-                                                    MarkdownCodeBlockBuilder(),
+                                                    _markdownCodeBlockBuilder,
                                               },
                                               fitContent: message.isUser,
                                               selectable: true,
@@ -640,8 +647,16 @@ extension on Color {
 }
 
 class MarkdownCodeBlockBuilder extends md.MarkdownElementBuilder {
+  late Highlighter highlighter;
+
+  Future<void> init(Highlighter highlighter) async {
+    this.highlighter = highlighter;
+  }
+
   @override
   Widget? visitText(text, TextStyle? preferredStyle) {
+    final highlightedCode = highlighter.highlight(text.text);
+
     return Container(
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.only(top: 8.0),
@@ -649,21 +664,29 @@ class MarkdownCodeBlockBuilder extends md.MarkdownElementBuilder {
         children: [
           Align(
             alignment: Alignment.centerLeft,
-            child: HighlightView(
-              text.text,
-              language: "dart",
-              theme: githubDarkTheme.map((key, value) {
-                return MapEntry(
-                  key,
-                  key == "root"
-                      ? value.copyWith(
-                          backgroundColor: Colors.transparent,
-                        )
-                      : value,
-                );
-              }),
-              padding: EdgeInsets.all(12),
+            child: Text.rich(
+              highlightedCode,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12.0,
+                fontFamily: "monospace",
+              ),
             ),
+            // HighlightView(
+            //   text.text,
+            //   language: "dart",
+            //   theme: githubDarkTheme.map((key, value) {
+            //     return MapEntry(
+            //       key,
+            //       key == "root"
+            //           ? value.copyWith(
+            //               backgroundColor: Colors.transparent,
+            //             )
+            //           : value,
+            //     );
+            //   }),
+            //   padding: EdgeInsets.all(12),
+            // ),
           ),
           Align(
             alignment: Alignment.topRight,
