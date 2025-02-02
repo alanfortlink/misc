@@ -27,9 +27,9 @@ class ShortcutPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        for (var shortcut in shortcuts)
+        for (var shortcut in shortcuts) ...[
           Container(
-            padding: const EdgeInsets.all(2),
+            padding: const EdgeInsets.all(4),
             margin: const EdgeInsets.all(4),
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -42,7 +42,7 @@ class ShortcutPanel extends StatelessWidget {
                       shortcut.command,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.5),
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -56,7 +56,7 @@ class ShortcutPanel extends StatelessWidget {
                       shortcut.description,
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.5),
-                        fontSize: 16,
+                        fontSize: 13,
                       ),
                     ),
                   ),
@@ -64,6 +64,14 @@ class ShortcutPanel extends StatelessWidget {
               ],
             ),
           ),
+          if (shortcut != shortcuts.last)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 64),
+              height: 1,
+              width: double.infinity,
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
+        ],
       ],
     );
   }

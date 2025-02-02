@@ -21,7 +21,7 @@ Future<void> main(List<String> args) async {
     backgroundColor: Colors.transparent,
     skipTaskbar: true,
     titleBarStyle: TitleBarStyle.hidden,
-    // windowButtonVisibility: false,
+    windowButtonVisibility: false,
   );
 
   await windowManager.waitUntilReadyToShow(windowOptions, () async {

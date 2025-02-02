@@ -483,10 +483,10 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                                             ),
                                           ),
                                         ).animate().scale(
-                                            duration: const Duration(
-                                                milliseconds: 100),
-                                            curve: Curves.easeOut,
-                                          ),
+                                              duration: const Duration(
+                                                  milliseconds: 100),
+                                              curve: Curves.easeOut,
+                                            ),
                                       ),
                                   ],
                                 ),
@@ -505,10 +505,10 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                               "No Messages Yet",
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.4),
-                                fontSize: 16.0,
+                                fontSize: 14.0,
                               ),
                             ),
-                            const SizedBox(height: 16.0),
+                            const SizedBox(height: 32.0),
                             ShortcutPanel(),
                           ],
                         ),
@@ -577,6 +577,10 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                           }
                           setState(() {});
                         },
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Colors.white.withValues(alpha: 0.8),
+                        ),
                         decoration: const InputDecoration(
                           hintText: "Prompt...",
                           border: InputBorder.none,
