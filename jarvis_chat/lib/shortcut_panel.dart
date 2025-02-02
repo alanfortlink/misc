@@ -21,6 +21,7 @@ class ShortcutPanel extends StatelessWidget {
     ShortcutInfo("Command + S", "Stop current response"),
     ShortcutInfo("Command + ,", "Open settings"),
     ShortcutInfo("Command + Shift + ,", "Show/Hide window"),
+    ShortcutInfo("/code or /image", "Prefix for /code and /image models"),
   ];
 
   @override

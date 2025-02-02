@@ -42,13 +42,19 @@ class OllamaClient {
     final chatAPI = "${store.address}:${store.port}/api/chat";
 
     final isImageRequest =
-        prompt.images.isNotEmpty || prompt.message.startsWith("/img");
+        prompt.images.isNotEmpty || prompt.message.startsWith("/image");
+
+    final isCodeRequest = prompt.message.startsWith("/code");
 
     final request = http.Request("POST", Uri.parse("http://$chatAPI"))
       ..headers["Content-Type"] = "application/json"
       ..body = jsonEncode(
         {
-          "model": (isImageRequest) ? store.imageModel : store.textModel,
+          "model": (isImageRequest)
+              ? store.imageModel
+              : isCodeRequest
+                  ? store.codeModel
+                  : store.textModel,
           "messages": [
             null, // System message
             ...previousMessages,

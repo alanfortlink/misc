@@ -21,8 +21,9 @@ class LocalStore extends ChangeNotifier {
     final defaultOptions = {
       "address": "127.0.0.1",
       "port": "11434",
-      "textModel": "codellama:latest",
+      "textModel": "llama3.2:latest",
       "imageModel": "llava:7b",
+      "codeModel": "codellama:latest",
     };
 
     for (final entry in defaultOptions.entries) {
@@ -65,6 +66,7 @@ class LocalStore extends ChangeNotifier {
   String get port => _prefs.getString("port")!;
   String get textModel => _prefs.getString("textModel")!;
   String get imageModel => _prefs.getString("imageModel")!;
+  String get codeModel => _prefs.getString("codeModel")!;
 
   bool _isServerUp = false;
   Future<bool> checkConnection() async {
@@ -101,6 +103,11 @@ class LocalStore extends ChangeNotifier {
 
   set imageModel(String value) {
     _prefs.setString("imageModel", value);
+    notifyListeners();
+  }
+
+  set codeModel(String value) {
+    _prefs.setString("codeModel", value);
     notifyListeners();
   }
 

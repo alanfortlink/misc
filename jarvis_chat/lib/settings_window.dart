@@ -18,6 +18,7 @@ class _SettingsWindowState extends State<SettingsWindow> {
   final TextEditingController _serverPortController = TextEditingController();
   final TextEditingController _textModelController = TextEditingController();
   final TextEditingController _imageModelController = TextEditingController();
+  final TextEditingController _codeModelController = TextEditingController();
 
   late final LocalStore store;
 
@@ -45,6 +46,7 @@ class _SettingsWindowState extends State<SettingsWindow> {
     _serverPortController.text = store.port;
     _textModelController.text = store.textModel;
     _imageModelController.text = store.imageModel;
+    _codeModelController.text = store.codeModel;
     setState(() {});
   }
 
@@ -119,10 +121,19 @@ class _SettingsWindowState extends State<SettingsWindow> {
                   TextField(
                     controller: _imageModelController,
                     decoration: const InputDecoration(
-                      labelText: "Image Model",
+                      labelText: "Image Model (/image)",
                     ),
                     onSubmitted: (value) {
                       store.imageModel = value;
+                    },
+                  ),
+                  TextField(
+                    controller: _codeModelController,
+                    decoration: const InputDecoration(
+                      labelText: "Code Model (/code)",
+                    ),
+                    onSubmitted: (value) {
+                      store.codeModel = value;
                     },
                   ),
                   Text(
@@ -132,6 +143,7 @@ class _SettingsWindowState extends State<SettingsWindow> {
                   Text("Port: ${store.port}"),
                   Text("Text Model: ${store.textModel}"),
                   Text("Image Model: ${store.imageModel}"),
+                  Text("Code Model: ${store.codeModel}"),
                   Divider(height: 5),
                   Text("Local Models:"),
                   Expanded(
