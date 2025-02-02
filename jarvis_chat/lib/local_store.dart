@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -73,5 +75,25 @@ class LocalStore extends ChangeNotifier {
   set imageModel(String value) {
     _prefs.setString("imageModel", value);
     notifyListeners();
+  }
+
+  List<String> _models = [];
+  List<String> get models => _models;
+
+  Future<void> loadModels() async {
+    _models = [];
+    try {
+      final response = await http.Client().get(
+        Uri.parse("http://$address:$port/api/tags"),
+      );
+      final json = jsonDecode(response.body);
+      for (final model in json["models"]) {
+        _models.add(model["name"].toString());
+      }
+    } catch (e) {
+      _models = [];
+    }
+
+    notifyListeners(triggerCheck: false);
   }
 }

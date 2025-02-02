@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jarvis_chat/chat_window.dart';
 import 'package:jarvis_chat/local_store.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
 class SettingsWindow extends StatefulWidget {
@@ -26,12 +27,17 @@ class _SettingsWindowState extends State<SettingsWindow> {
     store = Provider.of<LocalStore>(context, listen: false);
     store.addListener(_update);
     _update();
+    _loadModels();
   }
 
   @override
   void dispose() {
     store.removeListener(_update);
     super.dispose();
+  }
+
+  void _loadModels() async {
+    await store.loadModels();
   }
 
   void _update() async {
@@ -121,6 +127,46 @@ class _SettingsWindowState extends State<SettingsWindow> {
               Text("Port: ${store.port}"),
               Text("Text Model: ${store.textModel}"),
               Text("Image Model: ${store.imageModel}"),
+              Divider(height: 5),
+              Text("Local Models:"),
+              Expanded(
+                child: Container(
+                  child: ListView.builder(
+                    itemCount: store.models.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(store.models[index]),
+                        trailing: Container(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.copy),
+                                onPressed: () {
+                                  Clipboard.setData(
+                                    ClipboardData(text: store.models[index]),
+                                  );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Copied to clipboard"),
+                                    ),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(LineIcons.check),
+                                onPressed: () {
+                                  store.textModel = store.models[index];
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -128,4 +174,3 @@ class _SettingsWindowState extends State<SettingsWindow> {
     );
   }
 }
-
