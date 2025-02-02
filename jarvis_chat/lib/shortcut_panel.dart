@@ -20,6 +20,7 @@ class ShortcutPanel extends StatelessWidget {
     ShortcutInfo("Command + D", "Scroll down"),
     ShortcutInfo("Command + S", "Stop current response"),
     ShortcutInfo("Command + ,", "Open settings"),
+    ShortcutInfo("Command + Shift + ,", "Show/Hide window"),
   ];
 
   @override
