@@ -357,7 +357,16 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
           ),
         },
         child: Container(
-          color: backgroundColor,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                backgroundColor.withValues(alpha: 0.7),
+                backgroundColor.withValues(alpha: 1.0),
+              ],
+            ),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
