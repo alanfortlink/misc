@@ -88,17 +88,17 @@ class OllamaClient {
           .cast<Uint8List>()
           .toList();
 
-      if (json["model"].toString().contains("deepseek")) {
-        final endOfThinkingToken = "</think>";
-        if (!hasFinishedThinking) {
-          if (content.contains(endOfThinkingToken)) {
-            hasFinishedThinking = true;
-            content = content.split(endOfThinkingToken).last;
-          } else {
-            return;
-          }
-        }
-      }
+      // if (json["model"].toString().contains("deepseek")) {
+      //   final endOfThinkingToken = "</think>";
+      //   if (!hasFinishedThinking) {
+      //     if (content.contains(endOfThinkingToken)) {
+      //       hasFinishedThinking = true;
+      //       content = content.split(endOfThinkingToken).last;
+      //     } else {
+      //       return;
+      //     }
+      //   }
+      // }
       onData(content, json["done"], images);
     });
   }
