@@ -9,15 +9,16 @@ import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 class MainWindow extends StatefulWidget {
-  const MainWindow({super.key});
+  final LocalStore store;
+
+  const MainWindow({super.key, required this.store});
 
   @override
   State<MainWindow> createState() => _MainWindowState();
 }
 
-class _MainWindowState extends State<MainWindow> with TrayListener {
-  late final LocalStore store = LocalStore();
-
+class _MainWindowState extends State<MainWindow>
+    with TrayListener, WindowListener {
   void _toggle() async {
     if (await windowManager.isVisible()) {
       await windowManager.hide();
@@ -28,7 +29,6 @@ class _MainWindowState extends State<MainWindow> with TrayListener {
   }
 
   Future<void> _init() async {
-    await store.init();
     HotKey newChatHotKey = HotKey(
       key: PhysicalKeyboardKey.comma,
       modifiers: [HotKeyModifier.meta, HotKeyModifier.shift],
@@ -40,6 +40,28 @@ class _MainWindowState extends State<MainWindow> with TrayListener {
         _toggle();
       },
     );
+  }
+
+  Future<void> saveWindowState() async {
+    final position = await windowManager.getPosition();
+    widget.store.lastX = position.dx.toInt();
+    widget.store.lastY = position.dy.toInt();
+
+    final size = await windowManager.getSize();
+    widget.store.lastWidth = size.width.toInt();
+    widget.store.lastHeight = size.height.toInt();
+  }
+
+  @override
+  void onWindowResized() {
+    saveWindowState();
+    super.onWindowResized();
+  }
+
+  @override
+  void onWindowMoved() {
+    saveWindowState();
+    super.onWindowMoved();
   }
 
   @override
@@ -56,6 +78,7 @@ class _MainWindowState extends State<MainWindow> with TrayListener {
   @override
   void dispose() {
     trayManager.removeListener(this);
+    windowManager.removeListener(this);
     super.dispose();
   }
 
@@ -74,7 +97,7 @@ class _MainWindowState extends State<MainWindow> with TrayListener {
       home: CommandWCloser(
         child: Scaffold(
           body: ChangeNotifierProvider<LocalStore>.value(
-            value: store,
+            value: widget.store,
             child: ChatWindow(),
           ),
         ),
@@ -85,6 +108,7 @@ class _MainWindowState extends State<MainWindow> with TrayListener {
   @override
   void initState() {
     trayManager.addListener(this);
+    windowManager.addListener(this);
     super.initState();
     _init();
   }

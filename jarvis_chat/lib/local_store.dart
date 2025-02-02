@@ -36,6 +36,8 @@ class LocalStore extends ChangeNotifier {
 
   int get lastX => _prefs.getInt("lastX") ?? 0;
   int get lastY => _prefs.getInt("lastY") ?? 0;
+  int get lastWidth => _prefs.getInt("lastWidth") ?? 800;
+  int get lastHeight => _prefs.getInt("lastHeight") ?? 900;
 
   set lastX(int value) {
     _prefs.setInt("lastX", value);
@@ -43,6 +45,14 @@ class LocalStore extends ChangeNotifier {
 
   set lastY(int value) {
     _prefs.setInt("lastY", value);
+  }
+
+  set lastWidth(int value) {
+    _prefs.setInt("lastWidth", value);
+  }
+
+  set lastHeight(int value) {
+    _prefs.setInt("lastHeight", value);
   }
 
   String get address => _prefs.getString("address")!;

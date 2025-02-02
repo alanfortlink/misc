@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:jarvis_chat/local_store.dart';
 import 'package:jarvis_chat/main_window.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
@@ -7,9 +8,15 @@ import 'package:window_manager/window_manager.dart';
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  late final LocalStore store = LocalStore();
+  await store.init();
+
   await windowManager.ensureInitialized();
   WindowOptions windowOptions = WindowOptions(
-    size: Size(800, 900),
+    size: Size(
+      store.lastWidth.toDouble(),
+      store.lastHeight.toDouble(),
+    ),
     center: false,
     backgroundColor: Colors.transparent,
     skipTaskbar: true,
@@ -18,11 +25,17 @@ Future<void> main(List<String> args) async {
   );
 
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
+    windowManager.setPosition(
+      Offset(
+        store.lastX.toDouble(),
+        store.lastY.toDouble(),
+      ),
+    );
     await windowManager.show();
   });
 
   await trayManager.setIcon("assets/images/icon.png");
   await hotKeyManager.unregisterAll();
 
-  runApp(const MainWindow());
+  runApp(MainWindow(store: store));
 }
