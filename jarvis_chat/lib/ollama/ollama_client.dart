@@ -39,80 +39,93 @@ class OllamaClient {
     List<ChatMessage> previousMessages,
     LocalStore store,
   ) async {
-    final chatAPI = "${store.address}:${store.port}/api/chat";
+    try {
+      final chatAPI = "${store.address}:${store.port}/api/chat";
 
-    final isImageRequest =
-        prompt.images.isNotEmpty || prompt.message.startsWith("/image");
+      final isImageRequest =
+          prompt.images.isNotEmpty || prompt.message.startsWith("/image");
 
-    final isCodeRequest = prompt.message.startsWith("/code");
+      final isCodeRequest = prompt.message.startsWith("/code");
 
-    final request = http.Request("POST", Uri.parse("http://$chatAPI"))
-      ..headers["Content-Type"] = "application/json"
-      ..body = jsonEncode(
-        {
-          "model": (isImageRequest)
-              ? store.imageModel
-              : isCodeRequest
-                  ? store.codeModel
-                  : store.textModel,
-          "messages": [
-            null, // System message
-            ...previousMessages,
-            ChatMessage(
-              prompt.message,
-              true,
-              prompt.images,
-              "user",
-            ),
-          ]
-              .map((e) => {
-                    'role': e == null
-                        ? 'system'
-                        : e.isUser
-                            ? 'user'
-                            : 'assistant',
-                    'content': e == null
-                        ? (isImageRequest ? imageSystem : textSystem)
-                        : e.message,
-                    'images': e == null
-                        ? []
-                        : e.images.map((e) => base64Encode(e)).toList(),
-                  })
-              .toList(),
-          "options": {
+      final request = http.Request("POST", Uri.parse("http://$chatAPI"))
+        ..headers["Content-Type"] = "application/json"
+        ..body = jsonEncode(
+          {
+            "model": (isImageRequest)
+                ? store.imageModel
+                : isCodeRequest
+                    ? store.codeModel
+                    : store.textModel,
+            "messages": [
+              null, // System message
+              ...previousMessages,
+              ChatMessage(
+                prompt.message,
+                true,
+                prompt.images,
+                "user",
+              ),
+            ]
+                .map((e) => {
+                      'role': e == null
+                          ? 'system'
+                          : e.isUser
+                              ? 'user'
+                              : 'assistant',
+                      'content': e == null
+                          ? (isImageRequest ? imageSystem : textSystem)
+                          : e.message,
+                      'images': e == null
+                          ? []
+                          : e.images.map((e) => base64Encode(e)).toList(),
+                    })
+                .toList(),
+            "options": {
+              "temperature": 0.6,
+            },
             "temperature": 0.6,
+            "stream": true,
           },
-          "temperature": 0.6,
-          "stream": true,
-        },
-      );
+        );
 
-    final response = await client.send(request);
+      final response = await client.send(request);
 
-    hasFinishedThinking = false;
-    currentResponse = response.stream.transform(utf8.decoder).listen((data) {
-      final json = jsonDecode(data) as Map<dynamic, dynamic>;
-      final model = json["model"] as String;
-      final message = json["message"] as Map<dynamic, dynamic>;
-      String content = message["content"] as String;
-      final images = (message["images"] ?? [])
-          .map((e) => base64Decode(e as String))
-          .cast<Uint8List>()
-          .toList();
+      hasFinishedThinking = false;
 
-      // if (json["model"].toString().contains("deepseek")) {
-      //   final endOfThinkingToken = "</think>";
-      //   if (!hasFinishedThinking) {
-      //     if (content.contains(endOfThinkingToken)) {
-      //       hasFinishedThinking = true;
-      //       content = content.split(endOfThinkingToken).last;
-      //     } else {
-      //       return;
-      //     }
-      //   }
-      // }
-      onData(content, json["done"], images, model);
-    });
+      currentResponse = response.stream.transform(utf8.decoder).listen((data) {
+        try {
+          final json = jsonDecode(data) as Map<dynamic, dynamic>;
+          final model = json["model"] as String;
+          final message = json["message"] as Map<dynamic, dynamic>;
+          String content = message["content"] as String;
+          final images = (message["images"] ?? [])
+              .map((e) => base64Decode(e as String))
+              .cast<Uint8List>()
+              .toList();
+
+          // if (json["model"].toString().contains("deepseek")) {
+          //   final endOfThinkingToken = "</think>";
+          //   if (!hasFinishedThinking) {
+          //     if (content.contains(endOfThinkingToken)) {
+          //       hasFinishedThinking = true;
+          //       content = content.split(endOfThinkingToken).last;
+          //     } else {
+          //       return;
+          //     }
+          //   }
+          // }
+          onData(content, json["done"], images, model);
+        } catch (e) {
+          store.checkConnection();
+        }
+      });
+
+      currentResponse!.onError((e){
+        store.checkConnection();
+      });
+    } catch (e) {
+      store.checkConnection();
+    }
   }
 
   Future<void> stop() async {

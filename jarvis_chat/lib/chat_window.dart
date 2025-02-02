@@ -201,13 +201,16 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
     super.dispose();
   }
 
-  void _onPromptSubmitted(LocalStore store) {
+  void _onPromptSubmitted(LocalStore store) async {
     if (promptController.text.isEmpty) {
       return;
     }
 
     if (!store.isServerUp) {
-      return;
+      await store.checkConnection();
+      if (!store.isServerUp) {
+        return;
+      }
     }
 
     final prompt = ChatMessage(promptController.text, true, images, "user");
@@ -279,6 +282,8 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
   }
 
   void _stop() {
+    final store = Provider.of<LocalStore>(context, listen: false);
+    store.checkConnection();
     if (currentMessage == null) {
       return;
     }
@@ -329,6 +334,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
               } else if (intent.id == "submit") {
                 _onPromptSubmitted(store);
               } else if (intent.id == "clearAll") {
+                _stop();
                 pastMessages.clear();
                 images.clear();
               } else if (intent.id == "clearImages") {
