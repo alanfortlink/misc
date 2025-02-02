@@ -25,5 +25,7 @@ llava:7b for images
 
 
 
-https://github.com/user-attachments/assets/49c6d630-81e0-4d4c-b13b-70b6e4fc396a
+
+
+https://github.com/user-attachments/assets/e9682507-f0dc-4a58-b3ce-054ac8aaf0fd
 
