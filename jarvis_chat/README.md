@@ -7,11 +7,12 @@ tray_manager: ayatana-appindicator3-0.1 or appindicator3-0.1
 hotkey_manager: keybinder-3.0
 ```
 
-### RUN OLLAMA:
+### SHORTCUTS:
 
-```bash
-OLLAMA_HOST="127.0.0.1:6666" ollama serve
-```
+`Command + Shift + ,`: Open settings
+`Command + Shift + U`: Scroll Up
+`Command + Shift + D`: Scroll Down
+`Command + Shift + Enter`: Submit prompt
 
 ### MODELS:
 

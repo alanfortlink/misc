@@ -6,8 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:flutter_highlighting/themes/github-dark.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as md;
+import 'package:jarvis_chat/local_store.dart';
 import 'package:jarvis_chat/ollama/ollama_client.dart';
+import 'package:jarvis_chat/settings_window.dart';
 import 'package:pasteboard/pasteboard.dart';
+import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 class ShortcutIntent extends Intent {
@@ -142,13 +145,17 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
     super.dispose();
   }
 
-  void _onPromptSubmitted() {
+  void _onPromptSubmitted(LocalStore store) {
     if (promptController.text.isEmpty) {
       return;
     }
 
+    if (!store.isServerUp) {
+      return;
+    }
+
     final prompt = ChatMessage(promptController.text, true, images);
-    ollamaClient.send(prompt, pastMessages);
+    ollamaClient.send(prompt, pastMessages, store);
     pastMessages.add(prompt);
 
     images = [];
@@ -226,8 +233,12 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
     setState(() {});
   }
 
+  bool isCheckingConnection = false;
+
   @override
   Widget build(BuildContext context) {
+    final store = Provider.of<LocalStore>(context);
+
     final shortcuts = {
       LogicalKeyboardKey.keyS: "stop",
       LogicalKeyboardKey.keyV: "paste",
@@ -236,6 +247,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
       LogicalKeyboardKey.keyL: "clearAll",
       LogicalKeyboardKey.keyC: "clearImages",
       LogicalKeyboardKey.enter: "submit",
+      LogicalKeyboardKey.comma: "settings",
     };
 
     return Shortcuts(
@@ -258,13 +270,24 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
               } else if (intent.id == "scrollDown") {
                 _scrollOffset(200);
               } else if (intent.id == "submit") {
-                _onPromptSubmitted();
+                _onPromptSubmitted(store);
               } else if (intent.id == "clearAll") {
                 pastMessages.clear();
                 images.clear();
               } else if (intent.id == "clearImages") {
                 images.clear();
+              } else if (intent.id == "settings") {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ChangeNotifierProvider<LocalStore>.value(
+                      value: store,
+                      child: const SettingsWindow(),
+                    ),
+                  ),
+                );
               }
+
               setState(() {});
               return null;
             },
@@ -415,7 +438,7 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                       child: TextField(
                         maxLines: null,
                         focusNode: promptFocusNode,
-                        onSubmitted: (_) => _onPromptSubmitted(),
+                        onSubmitted: (_) => _onPromptSubmitted(store),
                         controller: promptController,
                         onChanged: (value) {
                           if (value.length > oldText.length + 1) {
@@ -431,20 +454,36 @@ class _ChatWindowState extends State<ChatWindow> with WindowListener {
                         ),
                       ),
                     ),
-                    currentMessage == null
+                    !store.isServerUp
                         ? IconButton(
-                            disabledColor: Colors.grey,
-                            onPressed: promptController.text.isEmpty
-                                ? null
-                                : _onPromptSubmitted,
-                            icon: const Icon(Icons.send),
-                          )
-                        : IconButton(
-                            onPressed: () {
-                              _stop();
+                            onPressed: () async {
+                              isCheckingConnection = true;
+                              setState(() {});
+                              await store.checkConnection();
+                              isCheckingConnection = false;
+                              setState(() {});
                             },
-                            icon: const Icon(Icons.stop),
-                          ),
+                            icon: Tooltip(
+                              message: "ollama server offline",
+                              child: Icon(
+                                Icons.cloud_off,
+                              ),
+                            ),
+                          )
+                        : currentMessage == null
+                            ? IconButton(
+                                disabledColor: Colors.grey,
+                                onPressed: promptController.text.isEmpty
+                                    ? null
+                                    : () => _onPromptSubmitted(store),
+                                icon: const Icon(Icons.send),
+                              )
+                            : IconButton(
+                                onPressed: () {
+                                  _stop();
+                                },
+                                icon: const Icon(Icons.stop),
+                              ),
                   ],
                 ),
               ),

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:jarvis_chat/chat_window.dart';
 import 'package:jarvis_chat/command_w_closer.dart';
+import 'package:jarvis_chat/local_store.dart';
+import 'package:provider/provider.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -14,6 +16,8 @@ class MainWindow extends StatefulWidget {
 }
 
 class _MainWindowState extends State<MainWindow> with TrayListener {
+  late final LocalStore store = LocalStore();
+
   void _toggle() async {
     if (await windowManager.isVisible()) {
       await windowManager.hide();
@@ -24,6 +28,7 @@ class _MainWindowState extends State<MainWindow> with TrayListener {
   }
 
   Future<void> _init() async {
+    await store.init();
     HotKey newChatHotKey = HotKey(
       key: PhysicalKeyboardKey.comma,
       modifiers: [HotKeyModifier.meta, HotKeyModifier.shift],
@@ -68,7 +73,10 @@ class _MainWindowState extends State<MainWindow> with TrayListener {
       ),
       home: CommandWCloser(
         child: Scaffold(
-          body: ChatWindow(),
+          body: ChangeNotifierProvider<LocalStore>.value(
+            value: store,
+            child: ChatWindow(),
+          ),
         ),
       ),
     );

@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:jarvis_chat/chat_window.dart';
-import 'package:jarvis_chat/ollama/ollama_server.dart';
+import 'package:jarvis_chat/local_store.dart';
 import 'package:http/http.dart' as http;
-
-String get textAPI => "${OllamaServer.host}/api/chat";
 
 String textSystem = """
 You are an assistant for a good software engineer. 
@@ -35,11 +33,14 @@ class OllamaClient {
   Future<void> send(
     ChatMessage prompt,
     List<ChatMessage> previousMessages,
+    LocalStore store,
   ) async {
+    final chatAPI = "${store.address}:${store.port}/api/chat";
+
     final isImageRequest =
         prompt.images.isNotEmpty || prompt.message.startsWith("/img");
 
-    final request = http.Request("POST", Uri.parse("http://$textAPI"))
+    final request = http.Request("POST", Uri.parse("http://$chatAPI"))
       ..headers["Content-Type"] = "application/json"
       ..body = jsonEncode(
         {
