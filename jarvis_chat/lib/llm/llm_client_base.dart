@@ -49,28 +49,32 @@ abstract class LLMClientBase {
   bool get isListening => _stream != null && !_stream!.isPaused;
 
   Future<void> sendRequest(LLMRequest llmRequest) async {
-    _stream?.cancel();
-    _stream = null;
+    try {
+      _stream?.cancel();
+      _stream = null;
 
-    final http.Request httpRequest = http.Request("POST", llmRequest.uri)
-      ..headers["Content-Type"] = "application/json"
-      ..body = llmRequest.body;
+      final http.Request httpRequest = http.Request("POST", llmRequest.uri)
+        ..headers["Content-Type"] = "application/json"
+        ..body = llmRequest.body;
 
-    final response = await http.Client().send(httpRequest);
+      final response = await http.Client().send(httpRequest);
 
-    _stream = response.stream.transform(utf8.decoder).listen(
-      (data) async {
-        await handleChunk(data);
-      },
-      onDone: () {
-        _stream?.cancel();
-        _stream = null;
-        handleDone();
-      },
-      onError: (error) {
-        handleError(error);
-      },
-    );
+      _stream = response.stream.transform(utf8.decoder).listen(
+        (data) async {
+          await handleChunk(data);
+        },
+        onDone: () {
+          _stream?.cancel();
+          _stream = null;
+          handleDone();
+        },
+        onError: (error) {
+          handleError(error);
+        },
+      );
+    } catch (e) {
+      handleError(e);
+    }
   }
 
   Future<void> stopListening() async {

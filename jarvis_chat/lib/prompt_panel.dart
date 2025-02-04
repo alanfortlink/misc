@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:jarvis_chat/image_panel.dart';
 import 'package:jarvis_chat/jarvis_theme.dart';
 import 'package:jarvis_chat/settings_page.dart';
@@ -21,9 +22,9 @@ class PromptPanel extends StatefulWidget {
 
 class _PromptPanelState extends State<PromptPanel> {
   String oldText = "";
-  bool lastServerUp = false;
 
   DateTime lastCheck = DateTime.now().subtract(const Duration(seconds: 2));
+  DateTime lastCommand = DateTime.now().subtract(const Duration(seconds: 2));
 
   Future<void> _onPromptChanged(value) async {
     if (value.length <= oldText.length + 1) {
@@ -34,29 +35,135 @@ class _PromptPanelState extends State<PromptPanel> {
 
   @override
   void initState() {
-    super.initState();
     _init();
+    super.initState();
   }
 
   void _init() async {
     final appState = Provider.of<AppState>(context, listen: false);
     final chatState = Provider.of<ChatState>(context, listen: false);
 
-    appState.serverUp = await chatState.checkConnection(appState);
-    setState(() {});
+    chatState.addOnDataCallback(_onData);
+    chatState.addOnErrorCallback(_onError);
 
-    chatState.addOnDataCallback(_autoScroll);
+    Future.delayed(
+      const Duration(milliseconds: 100),
+      () async {
+        appState.serverUp = await chatState.checkConnection(appState);
+      },
+    );
+
+    final shortcuts = {
+      LogicalKeyboardKey.keyS: () {
+        _stopPrompt();
+      },
+      LogicalKeyboardKey.keyV: () {
+        _handlePaste();
+      },
+      LogicalKeyboardKey.keyU: () {
+        _scrollOffset(-appState.lastHeight);
+      },
+      LogicalKeyboardKey.keyD: () {
+        _scrollOffset(appState.lastHeight);
+      },
+      LogicalKeyboardKey.keyL: () {
+        _stopPrompt();
+        chatState.clearAttachments();
+        chatState.messages.clear();
+      },
+      LogicalKeyboardKey.keyC: () {
+        chatState.clearAttachments();
+      },
+      LogicalKeyboardKey.enter: () {
+        _onPromptSubmitted();
+      },
+      LogicalKeyboardKey.comma: () {
+        if (DateTime.now().difference(lastCommand).inSeconds < 1) {
+          return;
+        }
+
+        lastCommand = DateTime.now();
+
+        if (SettingsPage.open) {
+          Navigator.of(context).pop();
+          SettingsPage.open = false;
+          return;
+        }
+
+        SettingsPage.open = true;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ChangeNotifierProvider<AppState>.value(
+              value: appState,
+              child: ChangeNotifierProvider<ChatState>.value(
+                value: chatState,
+                child: const SettingsPage(),
+              ),
+            ),
+          ),
+        );
+      },
+      LogicalKeyboardKey.semicolon: () {
+        appState.detailsEnabled = !appState.detailsEnabled;
+        if (appState.detailsEnabled) {
+          _scrollOffset(30);
+        }
+        chatState.clearAttachments();
+      },
+    };
+
+    for (final entry in shortcuts.entries) {
+      final key = entry.key;
+      final value = entry.value;
+
+      final newHotKey = HotKey(
+        key: key,
+        modifiers: [HotKeyModifier.meta],
+        scope: HotKeyScope.inapp,
+      );
+
+      await hotKeyManager.register(
+        newHotKey,
+        keyDownHandler: (hotKey) async {
+          value();
+        },
+      );
+    }
   }
 
   @override
   void dispose() {
     final chatState = Provider.of<ChatState>(context, listen: false);
-    chatState.removeOnDataCallback(_autoScroll);
+    chatState.removeOnDataCallback(_onData);
+    chatState.removeOnErrorCallback(_onError);
     super.dispose();
   }
 
-  void _autoScroll(_) async {
+  void _onError(_) async {
     final appState = Provider.of<AppState>(context, listen: false);
+    final chatState = Provider.of<ChatState>(context, listen: false);
+
+    if (DateTime.now().difference(lastCheck).inSeconds < 2) {
+      return;
+    }
+
+    lastCheck = DateTime.now();
+
+    appState.serverUp = await chatState.checkConnection(appState);
+    setState(() {});
+  }
+
+  void _onData(chunk, __) async {
+    final appState = Provider.of<AppState>(context, listen: false);
+
+    if (chunk.done) {
+      Future.delayed(
+        const Duration(milliseconds: 100),
+        () {
+          appState.promptFocusNode.requestFocus();
+        },
+      );
+    }
 
     if (!appState.messagesScrollController.hasClients) {
       return;
@@ -138,12 +245,17 @@ class _PromptPanelState extends State<PromptPanel> {
     final appState = Provider.of<AppState>(context, listen: false);
     final chatState = Provider.of<ChatState>(context, listen: false);
 
+    await _stopPrompt();
+
     if (appState.promptTextController.text.isEmpty) {
       return;
     }
 
     if (!appState.serverUp) {
-      return;
+      appState.serverUp = await chatState.checkConnection(appState);
+      if (!appState.serverUp) {
+        return;
+      }
     }
 
     await chatState.send(appState.promptTextController.text);
@@ -186,121 +298,61 @@ class _PromptPanelState extends State<PromptPanel> {
     final appState = Provider.of<AppState>(context);
     final chatState = Provider.of<ChatState>(context);
 
-    final shortcuts = {
-      LogicalKeyboardKey.keyS: "stop",
-      LogicalKeyboardKey.keyV: "paste",
-      LogicalKeyboardKey.keyU: "scrollUp",
-      LogicalKeyboardKey.keyD: "scrollDown",
-      LogicalKeyboardKey.keyL: "clearAll",
-      LogicalKeyboardKey.keyC: "clearImages",
-      LogicalKeyboardKey.enter: "submit",
-      LogicalKeyboardKey.comma: "settings",
-      LogicalKeyboardKey.semicolon: "toggleDetails",
-    };
-
-    return Shortcuts(
-      shortcuts: shortcuts.map(
-        (key, value) => MapEntry(
-          SingleActivator(key, meta: true, includeRepeats: true),
-          ShortcutIntent(value),
-        ),
-      ),
-      child: Actions(
-        actions: <Type, Action<Intent>>{
-          ShortcutIntent: CallbackAction<ShortcutIntent>(
-            onInvoke: (ShortcutIntent intent) async {
-              if (intent.id == "stop") {
-                _stopPrompt();
-              } else if (intent.id == "paste") {
-                _handlePaste();
-              } else if (intent.id == "scrollUp") {
-                _scrollOffset(-200);
-              } else if (intent.id == "scrollDown") {
-                _scrollOffset(200);
-              } else if (intent.id == "submit") {
-                _onPromptSubmitted();
-              } else if (intent.id == "clearAll") {
-                _stopPrompt();
-                chatState.clearAttachments();
-                chatState.messages.clear();
-              } else if (intent.id == "clearImages") {
-                chatState.clearAttachments();
-              } else if (intent.id == "toggleDetails") {
-                appState.detailsEnabled = !appState.detailsEnabled;
-                if (appState.detailsEnabled) {
-                  _scrollOffset(30);
-                }
-                chatState.clearAttachments();
-              } else if (intent.id == "settings") {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ChangeNotifierProvider<AppState>.value(
-                      value: appState,
-                      child: ChangeNotifierProvider<ChatState>.value(
-                        value: chatState,
-                        child: const SettingsPage(),
-                      ),
-                    ),
-                  ),
-                );
-              }
-
-              setState(() {});
-              return null;
-            },
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: JarvisTheme.darkerThanBackground,
+            borderRadius: BorderRadius.circular(16.0),
           ),
-        },
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: JarvisTheme.darkerThanBackground,
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      maxLines: null,
-                      controller: appState.promptTextController,
-                      focusNode: appState.promptFocusNode,
-                      style: TextStyle(
-                        color: JarvisTheme.textColor,
-                      ),
-                      onChanged: _onPromptChanged,
-                      decoration: InputDecoration(
-                        hintText: "Prompt...",
-                        border: InputBorder.none,
-                        fillColor: Colors.white,
-                      ),
-                    ),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: TextField(
+                  minLines: 1,
+                  maxLines: 8,
+                  controller: appState.promptTextController,
+                  focusNode: appState.promptFocusNode,
+                  autofocus: true,
+                  canRequestFocus: true,
+                  style: TextStyle(
+                    color: JarvisTheme.textColor,
                   ),
-                  (!appState.serverUp)
-                      ? IconButton(
-                          icon: Icon(Icons.cloud_off),
-                          onPressed: () async {
-                            await chatState.checkConnection(appState);
-                          },
-                        )
-                      : chatState.incoming == null
-                          ? IconButton(
-                              icon: Icon(Icons.send),
-                              onPressed: _onPromptSubmitted,
-                            )
-                          : IconButton(
-                              icon: Icon(Icons.stop),
-                              onPressed: _stopPrompt,
-                            )
-                ],
+                  onChanged: _onPromptChanged,
+                  decoration: InputDecoration(
+                    hintText: "Prompt...",
+                    border: InputBorder.none,
+                    fillColor: Colors.white,
+                  ),
+                ),
               ),
-            ),
-          ],
+              (!appState.serverUp)
+                  ? IconButton(
+                      icon: Icon(Icons.cloud_off),
+                      onPressed: () async {
+                        appState.serverUp =
+                            await chatState.checkConnection(appState);
+                        setState(() {});
+                      },
+                    )
+                  : chatState.incoming == null
+                      ? IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: _onPromptSubmitted,
+                        )
+                      : IconButton(
+                          icon: Icon(Icons.stop),
+                          onPressed: _stopPrompt,
+                        )
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

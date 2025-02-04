@@ -5,17 +5,23 @@ import 'package:jarvis_chat/jarvis_theme.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 
 class MarkdownCodeBlockBuilder extends md.MarkdownElementBuilder {
-  late Highlighter highlighter;
-  bool loaded = false;
+  static Highlighter? highlighter;
 
   Future<void> init() async {
+    if (highlighter != null) {
+      return;
+    }
     final theme = await HighlighterTheme.loadDarkTheme();
     highlighter = Highlighter(language: 'dart', theme: theme);
   }
 
   @override
   Widget? visitText(text, TextStyle? preferredStyle) {
-    final highlightedCode = highlighter.highlight(text.text);
+    if (highlighter == null) {
+      return super.visitText(text, preferredStyle);
+    }
+
+    final highlightedCode = highlighter!.highlight(text.text);
 
     return SelectionArea(
       child: Container(

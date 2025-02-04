@@ -10,6 +10,7 @@ class ChatState extends ChangeNotifier {
   ChatMessage? incoming;
   List<Uint8List> attachments = [];
   List<OnDataCallback> onDataCallbacks = [];
+  List<OnErrorCallback> onErrorCallbaks = [];
 
   late final LLMClientBase _client;
 
@@ -26,7 +27,15 @@ class ChatState extends ChangeNotifier {
     onDataCallbacks.remove(callback);
   }
 
-  Future<void> _onData(ChatMessageChunk chunk) async {
+  void addOnErrorCallback(OnErrorCallback callback) {
+    onErrorCallbaks.add(callback);
+  }
+
+  void removeOnErrorCallback(OnErrorCallback callback) {
+    onErrorCallbaks.remove(callback);
+  }
+
+  Future<void> _onData(ChatMessageChunk chunk, AppState appState) async {
     incoming ??= ChatMessage(
       content: "",
       images: [],
@@ -44,8 +53,9 @@ class ChatState extends ChangeNotifier {
     }
 
     for (final callback in onDataCallbacks) {
-      callback(chunk);
+      callback(chunk, appState);
     }
+
     notifyListeners();
   }
 
@@ -82,9 +92,23 @@ class ChatState extends ChangeNotifier {
 
   Future<void> _onError(Object error) async {
     if (incoming != null) {
-      messages.add(incoming!);
+      if (incoming!.content.trim().isNotEmpty) {
+        messages.add(incoming!);
+      } else {
+        messages.add(ChatMessage(
+          content: "An error occurred",
+          images: [],
+          isUser: false,
+          model: "",
+        ));
+      }
       incoming = null;
     }
+
+    for (final callback in onErrorCallbaks) {
+      callback(error);
+    }
+
     notifyListeners();
   }
 

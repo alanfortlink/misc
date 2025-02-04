@@ -26,6 +26,12 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          brightness: Brightness.dark,
+        ),
+      ),
       home: ChangeNotifierProvider.value(
         value: widget.store,
         child: ChangeNotifierProvider.value(

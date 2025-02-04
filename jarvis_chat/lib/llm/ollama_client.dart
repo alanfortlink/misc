@@ -6,6 +6,7 @@ import 'package:jarvis_chat/state/app_state.dart';
 
 typedef OnDataCallback = void Function(
   ChatMessageChunk chunk,
+  AppState appState,
 );
 
 typedef OnErrorCallback = void Function(
@@ -82,7 +83,7 @@ Do not explain too much, unless it is explicitly requested.
       model: model,
     );
 
-    onData(chatMessageChunk);
+    onData(chatMessageChunk, appState);
   }
 
   @override
@@ -121,16 +122,20 @@ Do not explain too much, unless it is explicitly requested.
 
   @override
   Future<bool> checkConnetion(AppState appState) async {
+    appState.serverUp = false;
     print("Checking connection");
     final baseUri = getBaseUri(appState);
     try {
-      final response = await http.Client().get(baseUri);
+      final response = await http.get(baseUri).timeout(Duration(seconds: 2));
       if (response.body.toLowerCase().contains("ollama")) {
+        print("Connection is up");
         return true;
       } else {
+        print("Connection is down 1");
         return false;
       }
-    } catch (e) {
+    } catch (_) {
+      print("Connection is down 2");
       return false;
     }
   }

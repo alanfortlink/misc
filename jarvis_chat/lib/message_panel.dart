@@ -5,7 +5,6 @@ import 'package:jarvis_chat/llm/llm_client_base.dart';
 import 'package:jarvis_chat/markdown_code_block_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as md;
-
 import 'state/app_state.dart';
 
 class MessagePanel extends StatefulWidget {
