@@ -167,6 +167,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     value: appState.useOpenAI,
                     onChanged: (value) {
                       appState.useOpenAI = value!;
+                      _updateConnectionStatus();
                       setState(() {});
                     },
                   ),
