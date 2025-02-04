@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 class ShortcutInfo {
@@ -10,22 +12,25 @@ class ShortcutInfo {
 class ShortcutPanel extends StatelessWidget {
   ShortcutPanel({super.key});
 
-  final shortcuts = [
-    ShortcutInfo("Command + Enter", "Submit prompt"),
-    ShortcutInfo("Command + V", "Paste content"),
-    ShortcutInfo("Command + L", "Clear messages"),
-    ShortcutInfo("Command + C", "Clear attachments"),
-    ShortcutInfo("Command + ;", "Toggle message details"),
-    ShortcutInfo("Command + U", "Scroll up"),
-    ShortcutInfo("Command + D", "Scroll down"),
-    ShortcutInfo("Command + S", "Stop current response"),
-    ShortcutInfo("Command + ,", "Open settings"),
-    ShortcutInfo("Command + Shift + ,", "Show/Hide window"),
-    ShortcutInfo("/code or /image", "Prefix for /code and /image models"),
-  ];
+  final keyboardKey = Platform.isMacOS ? "Command" : "Control";
 
   @override
   Widget build(BuildContext context) {
+    final shortcuts = [
+      ShortcutInfo("$keyboardKey + Enter", "Submit prompt"),
+      ShortcutInfo("$keyboardKey + V", "Paste content"),
+      ShortcutInfo("$keyboardKey + L", "Clear messages"),
+      ShortcutInfo("$keyboardKey + C", "Clear attachments"),
+      ShortcutInfo("$keyboardKey + ;", "Toggle message details"),
+      ShortcutInfo("$keyboardKey + U", "Scroll up"),
+      ShortcutInfo("$keyboardKey + D", "Scroll down"),
+      ShortcutInfo("$keyboardKey + S", "Stop current response"),
+      ShortcutInfo("$keyboardKey + ,", "Open settings"),
+      ShortcutInfo("$keyboardKey + /", "Switch between ollama / openai"),
+      ShortcutInfo("$keyboardKey + Shift + ,", "Show/Hide window"),
+      ShortcutInfo("/code or /image", "Prefix for /code and /image models"),
+    ];
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

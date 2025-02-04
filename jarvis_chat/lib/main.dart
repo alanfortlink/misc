@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:jarvis_chat/main_window.dart';
@@ -26,7 +28,7 @@ Future<void> main(List<String> args) async {
     ),
     center: false,
     backgroundColor: Colors.transparent,
-    skipTaskbar: true,
+    skipTaskbar:  Platform.isMacOS,
     titleBarStyle: TitleBarStyle.hidden,
     windowButtonVisibility: false,
   );

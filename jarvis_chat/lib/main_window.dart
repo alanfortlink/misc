@@ -45,7 +45,10 @@ class _MainWindowState extends State<MainWindow>
   Future<void> _init() async {
     HotKey newChatHotKey = HotKey(
       key: PhysicalKeyboardKey.comma,
-      modifiers: [HotKeyModifier.meta, HotKeyModifier.shift],
+      modifiers: [
+        Platform.isMacOS ? HotKeyModifier.meta : HotKeyModifier.control,
+        HotKeyModifier.shift
+      ],
     );
 
     await hotKeyManager.register(

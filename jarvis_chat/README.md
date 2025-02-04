@@ -14,16 +14,6 @@ There's a build for MacOS in [./installer/macos_dmg/](./installer/macos_dmg/).
 
 
 
-### SHORTCUTS:
-
-`Command + Shift + ,`: Open settings
-
-`Command + Shift + U`: Scroll Up
-
-`Command + Shift + D`: Scroll Down
-
-`Command + Shift + Enter`: Submit prompt
-
 ### MODELS:
 
 ```bash

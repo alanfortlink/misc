@@ -119,7 +119,9 @@ class _PromptPanelState extends State<PromptPanel> {
 
       final newHotKey = HotKey(
         key: key,
-        modifiers: [HotKeyModifier.meta],
+        modifiers: [
+          Platform.isMacOS ? HotKeyModifier.meta : HotKeyModifier.control
+        ],
         scope: HotKeyScope.inapp,
       );
 
