@@ -74,7 +74,23 @@ class _MainPanelState extends State<MainPanel> {
                 allMessages.isEmpty
                     ? Align(
                         alignment: Alignment.center,
-                        child: ShortcutPanel(),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "No messages yet",
+                                style: TextStyle(
+                                  color: JarvisTheme.textColor,
+                                  fontSize: 20.0,
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              ShortcutPanel(),
+                            ],
+                          ),
+                        ),
                       )
                     : ListView.separated(
                         controller: appState.messagesScrollController,
