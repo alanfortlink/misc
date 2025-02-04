@@ -4,15 +4,6 @@ import 'package:jarvis_chat/llm/llm_client_base.dart';
 import 'package:http/http.dart' as http;
 import 'package:jarvis_chat/state/app_state.dart';
 
-typedef OnDataCallback = void Function(
-  ChatMessageChunk chunk,
-  AppState appState,
-);
-
-typedef OnErrorCallback = void Function(
-  Object error,
-);
-
 class OllamaClient extends LLMClientBase {
   final OnDataCallback onData;
   final OnErrorCallback onError;
@@ -131,11 +122,14 @@ Do not explain too much, unless it is explicitly requested.
         print("Connection is up");
         return true;
       } else {
+        appState.addErrorMessage(
+          "Error connecting to ollama server: ${response.body}",
+        );
         print("Connection is down 1");
         return false;
       }
-    } catch (_) {
-      print("Connection is down 2");
+    } catch (e) {
+      appState.addErrorMessage("Error connecting to ollama server: $e");
       return false;
     }
   }

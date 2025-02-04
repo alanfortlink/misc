@@ -22,10 +22,14 @@ class ChatMessage {
 class LLMRequest {
   final Uri uri;
   final String body;
+  final Map<String, String> headers;
 
   LLMRequest({
     required this.uri,
     required this.body,
+    this.headers = const {
+      "Content-Type": "application/json",
+    },
   });
 }
 
@@ -43,10 +47,39 @@ class ChatMessageChunk {
   });
 }
 
+typedef OnDataCallback = void Function(
+  ChatMessageChunk chunk,
+  AppState appState,
+);
+
+typedef OnErrorCallback = void Function(
+  Object error,
+);
+
 abstract class LLMClientBase {
   StreamSubscription? _stream;
 
   bool get isListening => _stream != null && !_stream!.isPaused;
+
+  Future<void> sendNonStreaming(LLMRequest llmRequest) async {
+    try {
+      final http.Request httpRequest = http.Request("POST", llmRequest.uri)
+        ..body = llmRequest.body;
+
+      for (final entry in llmRequest.headers.entries) {
+        httpRequest.headers[entry.key] = entry.value;
+      }
+
+      final response = await http.Client().send(httpRequest);
+      final data = await response.stream.bytesToString();
+
+      print("DATA $data");
+
+      await handleChunk(data);
+    } catch (e) {
+      handleError(e);
+    }
+  }
 
   Future<void> sendRequest(LLMRequest llmRequest) async {
     try {
@@ -54,12 +87,18 @@ abstract class LLMClientBase {
       _stream = null;
 
       final http.Request httpRequest = http.Request("POST", llmRequest.uri)
-        ..headers["Content-Type"] = "application/json"
         ..body = llmRequest.body;
+
+      for (final entry in llmRequest.headers.entries) {
+        httpRequest.headers[entry.key] = entry.value;
+      }
 
       final response = await http.Client().send(httpRequest);
 
-      _stream = response.stream.transform(utf8.decoder).listen(
+      _stream = response.stream
+          .transform(utf8.decoder)
+          .transform(LineSplitter())
+          .listen(
         (data) async {
           await handleChunk(data);
         },

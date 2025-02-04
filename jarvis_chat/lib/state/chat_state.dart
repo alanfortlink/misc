@@ -2,7 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:jarvis_chat/llm/llm_client_base.dart';
-import 'package:jarvis_chat/llm/ollama_client.dart';
+import 'package:jarvis_chat/llm/ollama_client.dart' as ollama;
+import 'package:jarvis_chat/llm/openai_client.dart' as openai;
 import 'package:jarvis_chat/state/app_state.dart';
 
 class ChatState extends ChangeNotifier {
@@ -12,11 +13,16 @@ class ChatState extends ChangeNotifier {
   List<OnDataCallback> onDataCallbacks = [];
   List<OnErrorCallback> onErrorCallbaks = [];
 
-  late final LLMClientBase _client;
+  late final ollama.OllamaClient _ollamaClient;
+  late final openai.OpenAIClient _openaiClient;
 
   Future<void> init(AppState appState) async {
-    _client =
-        OllamaClient(appState: appState, onData: _onData, onError: _onError);
+    // _client =
+    //     OllamaClient(appState: appState, onData: _onData, onError: _onError);
+    _ollamaClient = ollama.OllamaClient(
+        appState: appState, onData: _onData, onError: _onError);
+    _openaiClient = openai.OpenAIClient(
+        appState: appState, onData: _onData, onError: _onError);
   }
 
   void addOnDataCallback(OnDataCallback callback) {
@@ -36,6 +42,10 @@ class ChatState extends ChangeNotifier {
   }
 
   Future<void> _onData(ChatMessageChunk chunk, AppState appState) async {
+    if (incoming == null && chunk.done) {
+      return;
+    }
+
     incoming ??= ChatMessage(
       content: "",
       images: [],
@@ -45,7 +55,10 @@ class ChatState extends ChangeNotifier {
 
     incoming!.content += chunk.content;
     incoming!.images.addAll(chunk.images);
-    incoming!.model = chunk.model;
+
+    if (chunk.model.isNotEmpty) {
+      incoming!.model = chunk.model;
+    }
 
     if (chunk.done) {
       messages.add(incoming!);
@@ -59,7 +72,7 @@ class ChatState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> send(String content) async {
+  Future<void> send(String content, AppState appState) async {
     final message = ChatMessage(
       content: content,
       images: attachments.toList(),
@@ -76,7 +89,12 @@ class ChatState extends ChangeNotifier {
 
     messages.add(message);
     attachments.clear();
-    _client.sendMessage(message, messages);
+
+    if (appState.useOpenAI) {
+      _openaiClient.sendMessage(message, messages);
+    } else {
+      _ollamaClient.sendMessage(message, messages);
+    }
     notifyListeners();
   }
 
@@ -112,12 +130,14 @@ class ChatState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> checkConnection(AppState store) async {
-    return await _client.checkConnetion(store);
+  Future<bool> checkConnection(AppState appState) async {
+    final client = appState.useOpenAI ? _openaiClient : _ollamaClient;
+    return await client.checkConnetion(appState);
   }
 
-  Future<void> stop() async {
-    await _client.stopListening();
+  Future<void> stop(AppState appState) async {
+    final client = appState.useOpenAI ? _openaiClient : _ollamaClient;
+    await client.stopListening();
     if (incoming != null) {
       messages.add(incoming!);
       incoming = null;

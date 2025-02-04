@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
-import 'package:jarvis_chat/image_panel.dart';
 import 'package:jarvis_chat/jarvis_theme.dart';
 import 'package:jarvis_chat/settings_page.dart';
-import 'package:jarvis_chat/shortcut_intent.dart';
 import 'package:jarvis_chat/state/chat_state.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:provider/provider.dart';
@@ -59,6 +57,9 @@ class _PromptPanelState extends State<PromptPanel> {
       },
       LogicalKeyboardKey.keyV: () {
         _handlePaste();
+      },
+      LogicalKeyboardKey.slash: () {
+        appState.useOpenAI = !appState.useOpenAI;
       },
       LogicalKeyboardKey.keyU: () {
         _scrollOffset(-appState.lastHeight);
@@ -165,21 +166,30 @@ class _PromptPanelState extends State<PromptPanel> {
       );
     }
 
-    if (!appState.messagesScrollController.hasClients) {
-      return;
-    }
+    Future.delayed(
+      const Duration(milliseconds: 100),
+      () {
+        if (!appState.messagesScrollController.hasClients) {
+          return;
+        }
 
-    if (appState.messagesScrollController.position.maxScrollExtent ==
-        appState.messagesScrollController.offset) {
-      return;
-    }
+        if (appState.messagesScrollController.position.maxScrollExtent ==
+            appState.messagesScrollController.offset) {
+          return;
+        }
 
-    appState.messagesScrollController.jumpTo(
-      appState.messagesScrollController.position.maxScrollExtent,
+        appState.messagesScrollController.jumpTo(
+          appState.messagesScrollController.position.maxScrollExtent,
+        );
+      },
     );
   }
 
   void _handlePaste() async {
+    if (SettingsPage.open) {
+      return;
+    }
+
     final appState = Provider.of<AppState>(context, listen: false);
     final chatState = Provider.of<ChatState>(context, listen: false);
 
@@ -258,7 +268,7 @@ class _PromptPanelState extends State<PromptPanel> {
       }
     }
 
-    await chatState.send(appState.promptTextController.text);
+    await chatState.send(appState.promptTextController.text, appState);
     appState.promptTextController.clear();
 
     if (appState.messagesScrollController.hasClients) {
@@ -277,8 +287,9 @@ class _PromptPanelState extends State<PromptPanel> {
   }
 
   Future<void> _stopPrompt() async {
+    final appState = Provider.of<AppState>(context, listen: false);
     final chatState = Provider.of<ChatState>(context, listen: false);
-    await chatState.stop();
+    await chatState.stop(appState);
   }
 
   void _scrollOffset(offset) {
@@ -342,7 +353,9 @@ class _PromptPanelState extends State<PromptPanel> {
                     )
                   : chatState.incoming == null
                       ? IconButton(
-                          icon: Icon(Icons.send),
+                          icon: Icon(
+                            appState.useOpenAI ? Icons.wifi : Icons.send,
+                          ),
                           onPressed: _onPromptSubmitted,
                         )
                       : IconButton(

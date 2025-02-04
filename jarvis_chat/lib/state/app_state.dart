@@ -5,11 +5,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class AppState extends ChangeNotifier {
-
   late final SharedPreferences _prefs;
   final promptTextController = TextEditingController();
   final promptFocusNode = FocusNode();
   final messagesScrollController = ScrollController();
+
+  List<String> errorMessages = [];
+
+  void addErrorMessage(String message) {
+    errorMessages.add("${DateTime.now()}: $message");
+    notifyListeners();
+  }
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -20,6 +26,9 @@ class AppState extends ChangeNotifier {
       "textModel": "llama3.2:latest",
       "imageModel": "llava:7b",
       "codeModel": "codellama:latest",
+      "apikey": "",
+      "openaiModel": "gpt-4o",
+      "openaiURL": "https://api.openai.com",
     };
 
     for (final entry in ollamaDefaultOptions.entries) {
@@ -27,6 +36,30 @@ class AppState extends ChangeNotifier {
         _prefs.setString(entry.key, entry.value);
       }
     }
+  }
+
+  String get openaiURL => _prefs.getString("openaiURL") ?? "";
+  set openaiURL(String value) {
+    _prefs.setString("openaiURL", value);
+    notifyListeners();
+  }
+
+  bool get useOpenAI => _prefs.getBool("useOpenAI") ?? false;
+  set useOpenAI(bool value) {
+    _prefs.setBool("useOpenAI", value);
+    notifyListeners();
+  }
+
+  String get apiKey => _prefs.getString("apikey") ?? "";
+  set apiKey(String value) {
+    _prefs.setString("apikey", value);
+    notifyListeners();
+  }
+
+  String get openaiModel => _prefs.getString("openaiModel") ?? "";
+  set openaiModel(String value) {
+    _prefs.setString("openaiModel", value);
+    notifyListeners();
   }
 
   int get lastX => _prefs.getInt("lastX") ?? 0;
