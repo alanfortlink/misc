@@ -9,12 +9,21 @@ class ChatState extends ChangeNotifier {
   final List<ChatMessage> messages = [];
   ChatMessage? incoming;
   List<Uint8List> attachments = [];
+  List<OnDataCallback> onDataCallbacks = [];
 
   late final LLMClientBase _client;
 
   Future<void> init(AppState appState) async {
     _client =
         OllamaClient(appState: appState, onData: _onData, onError: _onError);
+  }
+
+  void addOnDataCallback(OnDataCallback callback) {
+    onDataCallbacks.add(callback);
+  }
+
+  void removeOnDataCallback(OnDataCallback callback) {
+    onDataCallbacks.remove(callback);
   }
 
   Future<void> _onData(ChatMessageChunk chunk) async {
@@ -34,6 +43,9 @@ class ChatState extends ChangeNotifier {
       incoming = null;
     }
 
+    for (final callback in onDataCallbacks) {
+      callback(chunk);
+    }
     notifyListeners();
   }
 

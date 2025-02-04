@@ -45,17 +45,17 @@ class _PromptPanelState extends State<PromptPanel> {
     appState.serverUp = await chatState.checkConnection(appState);
     setState(() {});
 
-    chatState.addListener(_autoScroll);
+    chatState.addOnDataCallback(_autoScroll);
   }
 
   @override
   void dispose() {
     final chatState = Provider.of<ChatState>(context, listen: false);
-    chatState.removeListener(_autoScroll);
+    chatState.removeOnDataCallback(_autoScroll);
     super.dispose();
   }
 
-  void _autoScroll() async {
+  void _autoScroll(_) async {
     final appState = Provider.of<AppState>(context, listen: false);
 
     if (!appState.messagesScrollController.hasClients) {
@@ -67,10 +67,8 @@ class _PromptPanelState extends State<PromptPanel> {
       return;
     }
 
-    appState.messagesScrollController.animateTo(
+    appState.messagesScrollController.jumpTo(
       appState.messagesScrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 10),
-      curve: Curves.elasticOut,
     );
   }
 
