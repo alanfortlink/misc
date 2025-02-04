@@ -179,6 +179,24 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ],
               ),
+              Row(
+                children: [
+                  Checkbox(
+                    value: appState.useSystemCommand,
+                    onChanged: (value) {
+                      appState.useSystemCommand = value!;
+                      _updateConnectionStatus();
+                      setState(() {});
+                    },
+                  ),
+                  const Text(
+                    "Use 'system' Command",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
               TextField(
                 style: const TextStyle(color: Colors.white),
                 controller: _openaiUrlController,

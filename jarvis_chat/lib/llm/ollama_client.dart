@@ -101,7 +101,9 @@ Do not explain too much, unless it is explicitly requested.
       body: jsonEncode(
         {
           "model": getModel(message, appState),
-          "messages": [null, ...history, message].map(parseMessage).toList(),
+          "messages": [if (appState.useSystemCommand) null, ...history, message]
+              .map(parseMessage)
+              .toList(),
           "temperature": 0.6,
           "stream": true,
         },

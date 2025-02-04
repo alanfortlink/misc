@@ -14,6 +14,9 @@ class AppState extends ChangeNotifier {
 
   void addErrorMessage(String message) {
     errorMessages.add("${DateTime.now()}: $message");
+    if (errorMessages.length > 10) {
+      errorMessages.removeAt(0);
+    }
     notifyListeners();
   }
 
@@ -41,6 +44,12 @@ class AppState extends ChangeNotifier {
   String get openaiURL => _prefs.getString("openaiURL") ?? "";
   set openaiURL(String value) {
     _prefs.setString("openaiURL", value);
+    notifyListeners();
+  }
+
+  bool get useSystemCommand => _prefs.getBool("useSystemCommand") ?? false;
+  set useSystemCommand(bool value) {
+    _prefs.setBool("useSystemCommand", value);
     notifyListeners();
   }
 

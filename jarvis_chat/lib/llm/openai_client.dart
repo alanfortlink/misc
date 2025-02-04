@@ -32,7 +32,19 @@ Do not explain too much, unless it is explicitly requested.
 
     return {
       "role": message.isUser ? "user" : "assistant",
-      "content": message.content,
+      "content": [
+        {
+          "type": "text",
+          "text": message.content,
+        },
+        for (final image in message.images)
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "data:image/jpeg;base64,${base64Encode(image)}",
+            },
+          },
+      ],
       // TODO: Images to openai
       // "images": message.images.map((e) => base64Encode(e)).toList(),
     };
@@ -44,58 +56,63 @@ Do not explain too much, unless it is explicitly requested.
 
   @override
   Future<void> handleChunk(String chunk) async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-    if (chunk.trim().isEmpty) {
-      return;
-    }
+    try {
+      await Future.delayed(const Duration(milliseconds: 1000));
+      if (chunk.trim().isEmpty) {
+        return;
+      }
 
-    final line =
-        chunk.startsWith('data: ') ? chunk.replaceFirst('data: ', '') : chunk;
+      final line =
+          chunk.startsWith('data: ') ? chunk.replaceFirst('data: ', '') : chunk;
 
-    if (line.trim() == '[DONE]') {
+      if (line.trim() == '[DONE]') {
+        final chatMessageChunk = ChatMessageChunk(
+          content: "",
+          images: [],
+          done: true,
+          model: "",
+        );
+        onData(chatMessageChunk, appState);
+        return;
+      }
+
+      final Map<String, dynamic> jsonData = jsonDecode(line);
+
+      final model = jsonData["model"] ?? "unknown-model";
+      final choices = jsonData["choices"] as List<dynamic>?;
+
+      if (choices == null || choices.isEmpty) {
+        final chatMessageChunk = ChatMessageChunk(
+          content: "",
+          images: [],
+          done: true,
+          model: model,
+        );
+        onData(chatMessageChunk, appState);
+        return;
+      }
+
+      final choice = choices.first;
+      final delta = choice["delta"] as Map<String, dynamic>? ?? {};
+      final finishReason = choice["finish_reason"];
+
+      final partialContent = delta["content"] as String? ?? "";
+
+      // Indicate "done" if finish_reason is set; otherwise keep streaming.
+      final isDone = finishReason != null && finishReason.isNotEmpty;
+
       final chatMessageChunk = ChatMessageChunk(
-        content: "",
-        images: [],
-        done: true,
-        model: "",
-      );
-      onData(chatMessageChunk, appState);
-      return;
-    }
-
-    final Map<String, dynamic> jsonData = jsonDecode(line);
-
-    final model = jsonData["model"] ?? "unknown-model";
-    final choices = jsonData["choices"] as List<dynamic>?;
-
-    if (choices == null || choices.isEmpty) {
-      final chatMessageChunk = ChatMessageChunk(
-        content: "",
-        images: [],
-        done: true,
+        content: partialContent,
+        images: [], // Not used in standard ChatCompletion
+        done: isDone,
         model: model,
       );
+
       onData(chatMessageChunk, appState);
-      return;
+    } catch (e) {
+      appState.addErrorMessage("OpenAI error: $chunk $e");
+      onError(e);
     }
-
-    final choice = choices.first;
-    final delta = choice["delta"] as Map<String, dynamic>? ?? {};
-    final finishReason = choice["finish_reason"];
-
-    final partialContent = delta["content"] as String? ?? "";
-
-    // Indicate "done" if finish_reason is set; otherwise keep streaming.
-    final isDone = finishReason != null && finishReason.isNotEmpty;
-
-    final chatMessageChunk = ChatMessageChunk(
-      content: partialContent,
-      images: [], // Not used in standard ChatCompletion
-      done: isDone,
-      model: model,
-    );
-
-    onData(chatMessageChunk, appState);
   }
 
   @override
@@ -112,8 +129,10 @@ Do not explain too much, unless it is explicitly requested.
     // Prepare the OpenAI request body
     final body = {
       "model": getModel(message, appState),
-      "messages": [null, ...history, message].map(parseMessage).toList(),
-      "temperature": 0.6,
+      "messages": [if (appState.useSystemCommand) null, ...history, message]
+          .map(parseMessage)
+          .toList(),
+      "temperature": 1,
       "stream": true,
     };
 
@@ -142,14 +161,13 @@ Do not explain too much, unless it is explicitly requested.
             body: jsonEncode({
               "model": appState.openaiModel,
               "messages": [
-                {"role": "system", "content": "ping"}
+                {"role": "user", "content": "ping"}
               ],
-              "max_tokens": 2,
               "stream": false,
-              "temperature": 0.6,
+              "temperature": 1,
             }),
           )
-          .timeout(const Duration(seconds: 4));
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         return true;
