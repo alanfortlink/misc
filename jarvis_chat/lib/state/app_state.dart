@@ -47,7 +47,7 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get useSystemCommand => _prefs.getBool("useSystemCommand") ?? false;
+  bool get useSystemCommand => _prefs.getBool("useSystemCommand") ?? true;
   set useSystemCommand(bool value) {
     _prefs.setBool("useSystemCommand", value);
     notifyListeners();

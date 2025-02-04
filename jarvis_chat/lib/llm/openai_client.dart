@@ -167,7 +167,7 @@ Do not explain too much, unless it is explicitly requested.
               "temperature": 1,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         return true;
