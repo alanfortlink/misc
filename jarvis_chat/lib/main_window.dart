@@ -3,17 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
-import 'package:jarvis_chat/chat_window.dart';
-import 'package:jarvis_chat/command_w_closer.dart';
-import 'package:jarvis_chat/local_store.dart';
-import 'package:provider/provider.dart';
+import 'package:jarvis_chat/main_page.dart';
+import 'package:jarvis_chat/state/chat_state.dart';
+import 'package:jarvis_chat/state/app_state.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 class MainWindow extends StatefulWidget {
-  final LocalStore store;
+  final AppState store;
+  final ChatState chatState;
 
-  const MainWindow({super.key, required this.store});
+  const MainWindow({
+    super.key,
+    required this.store,
+    required this.chatState,
+  });
 
   @override
   State<MainWindow> createState() => _MainWindowState();
@@ -103,26 +107,7 @@ class _MainWindowState extends State<MainWindow>
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Jarvis Chat',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      home: SelectionArea(
-        child: CommandWCloser(
-          child: Scaffold(
-            body: ChangeNotifierProvider<LocalStore>.value(
-              value: widget.store,
-              child: ChatWindow(),
-            ),
-          ),
-        ),
-      ),
-    );
+    return MainPage(store: widget.store, chatState: widget.chatState);
   }
 
   @override

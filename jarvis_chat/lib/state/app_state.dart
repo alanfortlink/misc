@@ -4,21 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class LocalStore extends ChangeNotifier {
-  late final SharedPreferences _prefs;
+class AppState extends ChangeNotifier {
 
-  @override
-  void notifyListeners({bool triggerCheck = true}) {
-    if (triggerCheck) {
-      checkConnection();
-    }
-    super.notifyListeners();
-  }
+  late final SharedPreferences _prefs;
+  final promptTextController = TextEditingController();
+  final promptFocusNode = FocusNode();
+  final messagesScrollController = ScrollController();
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
 
-    final defaultOptions = {
+    final ollamaDefaultOptions = {
       "address": "127.0.0.1",
       "port": "11434",
       "textModel": "llama3.2:latest",
@@ -26,13 +22,11 @@ class LocalStore extends ChangeNotifier {
       "codeModel": "codellama:latest",
     };
 
-    for (final entry in defaultOptions.entries) {
+    for (final entry in ollamaDefaultOptions.entries) {
       if (!_prefs.containsKey(entry.key)) {
         _prefs.setString(entry.key, entry.value);
       }
     }
-
-    checkConnection();
   }
 
   int get lastX => _prefs.getInt("lastX") ?? 0;
@@ -59,7 +53,7 @@ class LocalStore extends ChangeNotifier {
   bool get detailsEnabled => _prefs.getBool("detailsEnabled") ?? false;
   set detailsEnabled(bool value) {
     _prefs.setBool("detailsEnabled", value);
-    notifyListeners(triggerCheck: false);
+    notifyListeners();
   }
 
   String get address => _prefs.getString("address")!;
@@ -68,23 +62,12 @@ class LocalStore extends ChangeNotifier {
   String get imageModel => _prefs.getString("imageModel")!;
   String get codeModel => _prefs.getString("codeModel")!;
 
-  bool _isServerUp = false;
-  Future<bool> checkConnection() async {
-    _isServerUp = false;
-    try {
-      final response = await http.Client().get(
-        Uri.parse("http://$address:$port"),
-      );
-      _isServerUp = response.body.toLowerCase().contains("ollama");
-    } catch (e) {
-      _isServerUp = false;
-    }
-
-    notifyListeners(triggerCheck: false);
-    return _isServerUp;
+  bool _serverUp = false;
+  bool get serverUp => _serverUp;
+  set serverUp(bool value) {
+    _serverUp = value;
+    notifyListeners();
   }
-
-  bool get isServerUp => _isServerUp;
 
   set address(String value) {
     _prefs.setString("address", value);
@@ -128,6 +111,6 @@ class LocalStore extends ChangeNotifier {
       _models = [];
     }
 
-    notifyListeners(triggerCheck: false);
+    notifyListeners();
   }
 }

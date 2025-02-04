@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
-import 'package:jarvis_chat/local_store.dart';
 import 'package:jarvis_chat/main_window.dart';
+import 'package:jarvis_chat/state/chat_state.dart';
+import 'package:jarvis_chat/state/app_state.dart';
 import 'package:syntax_highlight/syntax_highlight.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
@@ -9,10 +10,13 @@ import 'package:window_manager/window_manager.dart';
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  late final LocalStore store = LocalStore();
+  late final AppState store = AppState();
   await store.init();
 
-  await Highlighter.initialize(['dart', 'yaml', 'sql']);
+  late final chatState = ChatState();
+  await chatState.init(store);
+
+  await Highlighter.initialize(['dart']);
 
   await windowManager.ensureInitialized();
   WindowOptions windowOptions = WindowOptions(
@@ -59,5 +63,5 @@ Future<void> main(List<String> args) async {
 
   await hotKeyManager.unregisterAll();
 
-  runApp(MainWindow(store: store));
+  runApp(MainWindow(store: store, chatState: chatState));
 }

@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:jarvis_chat/chat_window.dart';
-import 'package:jarvis_chat/local_store.dart';
+import 'package:jarvis_chat/jarvis_theme.dart';
+import 'package:jarvis_chat/shortcut_intent.dart';
+import 'package:jarvis_chat/state/app_state.dart';
+import 'package:jarvis_chat/state/chat_state.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
 
-class SettingsWindow extends StatefulWidget {
-  const SettingsWindow({super.key});
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
 
   @override
-  State<SettingsWindow> createState() => _SettingsWindowState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsWindowState extends State<SettingsWindow> {
+class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _serverAddressController =
       TextEditingController();
   final TextEditingController _serverPortController = TextEditingController();
@@ -20,39 +22,46 @@ class _SettingsWindowState extends State<SettingsWindow> {
   final TextEditingController _imageModelController = TextEditingController();
   final TextEditingController _codeModelController = TextEditingController();
 
-  late final LocalStore store;
+  late final AppState appState;
 
   @override
   void initState() {
     super.initState();
-    store = Provider.of<LocalStore>(context, listen: false);
-    store.addListener(_update);
+    appState = Provider.of<AppState>(context, listen: false);
+    appState.addListener(_update);
     _update();
     _loadModels();
   }
 
   @override
   void dispose() {
-    store.removeListener(_update);
+    appState.removeListener(_update);
     super.dispose();
   }
 
   void _loadModels() async {
-    await store.loadModels();
+    await appState.loadModels();
   }
 
   void _update() async {
-    _serverAddressController.text = store.address;
-    _serverPortController.text = store.port;
-    _textModelController.text = store.textModel;
-    _imageModelController.text = store.imageModel;
-    _codeModelController.text = store.codeModel;
+    _serverAddressController.text = appState.address;
+    _serverPortController.text = appState.port;
+    _textModelController.text = appState.textModel;
+    _imageModelController.text = appState.imageModel;
+    _codeModelController.text = appState.codeModel;
+    setState(() {});
+  }
+
+  Future<void> _updateConnectionStatus() async {
+    final chatState = Provider.of<ChatState>(context, listen: false);
+    appState.serverUp = await chatState.checkConnection(appState);
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<LocalStore>(context);
+    final appState = Provider.of<AppState>(context);
+    final chatState = Provider.of<ChatState>(context);
 
     final shortcuts = {
       LogicalKeyboardKey.keyW: "setting",
@@ -81,88 +90,134 @@ class _SettingsWindowState extends State<SettingsWindow> {
         child: SelectionArea(
           child: Scaffold(
             appBar: AppBar(
-              backgroundColor: backgroundColor,
-              title: const Text("Settings"),
+              foregroundColor: Colors.white,
+              backgroundColor: JarvisTheme.backgroundColor,
+              title: const Text(
+                "Settings",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
             ),
             body: Container(
               padding: const EdgeInsets.all(16),
-              color: backgroundColor,
+              color: JarvisTheme.backgroundColor,
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   TextField(
+                    style: const TextStyle(color: Colors.white),
                     controller: _serverAddressController,
                     decoration: const InputDecoration(
                       labelText: "Server Address",
+                      labelStyle: TextStyle(color: Colors.grey),
                     ),
                     onSubmitted: (value) {
-                      store.address = value;
+                      appState.address = value;
+                      _updateConnectionStatus();
                     },
                   ),
                   TextField(
+                    style: const TextStyle(color: Colors.white),
                     controller: _serverPortController,
                     decoration: const InputDecoration(
                       labelText: "Server Port",
+                      labelStyle: TextStyle(color: Colors.grey),
                     ),
                     onSubmitted: (value) {
-                      store.port = value;
+                      appState.port = value;
+                      _updateConnectionStatus();
                     },
                   ),
                   TextField(
+                    style: const TextStyle(color: Colors.white),
                     controller: _textModelController,
                     decoration: const InputDecoration(
                       labelText: "Text Model",
+                      labelStyle: TextStyle(color: Colors.grey),
                     ),
                     onSubmitted: (value) {
-                      store.textModel = value;
+                      appState.textModel = value;
+                      _updateConnectionStatus();
                     },
                   ),
                   TextField(
+                    style: const TextStyle(color: Colors.white),
                     controller: _imageModelController,
                     decoration: const InputDecoration(
                       labelText: "Image Model (/image)",
+                      labelStyle: TextStyle(color: Colors.grey),
                     ),
                     onSubmitted: (value) {
-                      store.imageModel = value;
+                      appState.imageModel = value;
+                      _updateConnectionStatus();
                     },
                   ),
                   TextField(
+                    style: const TextStyle(color: Colors.white),
                     controller: _codeModelController,
                     decoration: const InputDecoration(
                       labelText: "Code Model (/code)",
+                      labelStyle: TextStyle(color: Colors.grey),
                     ),
                     onSubmitted: (value) {
-                      store.codeModel = value;
+                      appState.codeModel = value;
+                      _updateConnectionStatus();
                     },
                   ),
                   Text(
-                    "Connection Status: ${store.isServerUp ? "Up" : "Down"}",
+                    "Connection Status: ${appState.serverUp ? "Up" : "Down"}",
+                    style: const TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
-                  Text("Address: ${store.address}"),
-                  Text("Port: ${store.port}"),
-                  Text("Text Model: ${store.textModel}"),
-                  Text("Image Model: ${store.imageModel}"),
-                  Text("Code Model: ${store.codeModel}"),
+                  Text("Address: ${appState.address}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                      )),
+                  Text("Port: ${appState.port}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                      )),
+                  Text("Text Model: ${appState.textModel}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                      )),
+                  Text("Image Model: ${appState.imageModel}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                      )),
+                  Text("Code Model: ${appState.codeModel}",
+                      style: const TextStyle(
+                        color: Colors.white,
+                      )),
                   Divider(height: 5),
-                  Text("Local Models:"),
+                  Text("Local Models:",
+                      style: const TextStyle(
+                        color: Colors.white,
+                      )),
                   Expanded(
                     child: Container(
                       child: ListView.builder(
-                        itemCount: store.models.length,
+                        itemCount: appState.models.length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            title: Text(store.models[index]),
+                            title: Text(appState.models[index],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                )),
                             trailing: Container(
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.copy),
+                                    icon: const Icon(Icons.copy,
+                                        color: Colors.white),
                                     onPressed: () {
                                       Clipboard.setData(
                                         ClipboardData(
-                                            text: store.models[index]),
+                                            text: appState.models[index]),
                                       );
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
@@ -173,9 +228,11 @@ class _SettingsWindowState extends State<SettingsWindow> {
                                     },
                                   ),
                                   IconButton(
-                                    icon: const Icon(LineIcons.check),
+                                    icon: const Icon(LineIcons.check,
+                                        color: Colors.white),
                                     onPressed: () {
-                                      store.textModel = store.models[index];
+                                      appState.textModel =
+                                          appState.models[index];
                                     },
                                   ),
                                 ],

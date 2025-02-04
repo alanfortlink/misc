@@ -27,6 +27,7 @@ class ShortcutPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         for (var shortcut in shortcuts) ...[
           Container(
