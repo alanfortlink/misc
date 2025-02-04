@@ -28,8 +28,9 @@ Future<void> main(List<String> args) async {
     ),
     center: false,
     backgroundColor: Colors.transparent,
-    skipTaskbar:  Platform.isMacOS,
-    titleBarStyle: TitleBarStyle.hidden,
+    skipTaskbar: Platform.isMacOS,
+    titleBarStyle:
+        Platform.isMacOS ? TitleBarStyle.hidden : TitleBarStyle.normal,
     windowButtonVisibility: false,
   );
 
