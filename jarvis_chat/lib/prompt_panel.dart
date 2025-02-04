@@ -31,6 +31,8 @@ class _PromptPanelState extends State<PromptPanel> {
     setState(() {});
   }
 
+  bool isCheckingConnection = false;
+
   @override
   void initState() {
     _init();
@@ -58,8 +60,15 @@ class _PromptPanelState extends State<PromptPanel> {
       LogicalKeyboardKey.keyV: () {
         _handlePaste();
       },
-      LogicalKeyboardKey.slash: () {
+      LogicalKeyboardKey.slash: () async {
         appState.useOpenAI = !appState.useOpenAI;
+        isCheckingConnection = true;
+        setState(() {});
+        try {
+          appState.serverUp = await chatState.checkConnection(appState);
+        } catch (_) {}
+        isCheckingConnection = false;
+        setState(() {});
       },
       LogicalKeyboardKey.keyU: () {
         _scrollOffset(-appState.lastHeight);
@@ -344,26 +353,36 @@ class _PromptPanelState extends State<PromptPanel> {
                   ),
                 ),
               ),
-              (!appState.serverUp)
-                  ? IconButton(
-                      icon: Icon(Icons.cloud_off),
-                      onPressed: () async {
-                        appState.serverUp =
-                            await chatState.checkConnection(appState);
-                        setState(() {});
-                      },
+              isCheckingConnection
+                  ? Container(
+                      width: 24.0,
+                      height: 24.0,
+                      child: CircularProgressIndicator(
+                        color: Colors.white.withValues(
+                          alpha: 0.5,
+                        ),
+                      ),
                     )
-                  : chatState.incoming == null
+                  : (!appState.serverUp)
                       ? IconButton(
-                          icon: Icon(
-                            appState.useOpenAI ? Icons.wifi : Icons.send,
-                          ),
-                          onPressed: _onPromptSubmitted,
+                          icon: Icon(Icons.cloud_off),
+                          onPressed: () async {
+                            appState.serverUp =
+                                await chatState.checkConnection(appState);
+                            setState(() {});
+                          },
                         )
-                      : IconButton(
-                          icon: Icon(Icons.stop),
-                          onPressed: _stopPrompt,
-                        )
+                      : chatState.incoming == null
+                          ? IconButton(
+                              icon: Icon(
+                                appState.useOpenAI ? Icons.wifi : Icons.send,
+                              ),
+                              onPressed: _onPromptSubmitted,
+                            )
+                          : IconButton(
+                              icon: Icon(Icons.stop),
+                              onPressed: _stopPrompt,
+                            )
             ],
           ),
         ),
