@@ -255,21 +255,6 @@ class _PromptPanelState extends State<PromptPanel> {
         },
         child: Column(
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: chatState.attachments
-                  .map(
-                    (attachment) => ImagePanel(
-                      attachment,
-                      onRemove: () {
-                        chatState.attachments.remove(attachment);
-                        setState(() {});
-                      },
-                    ),
-                  )
-                  .toList(),
-            ),
             Container(
               padding: const EdgeInsets.all(12.0),
               decoration: BoxDecoration(

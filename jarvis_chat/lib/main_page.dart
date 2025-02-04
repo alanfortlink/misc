@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jarvis_chat/image_panel.dart';
 import 'package:jarvis_chat/jarvis_theme.dart';
 import 'package:jarvis_chat/message_panel.dart';
 import 'package:jarvis_chat/prompt_panel.dart';
@@ -62,29 +63,52 @@ class _MainPanelState extends State<MainPanel> {
       child: Column(
         children: [
           Expanded(
-            child: allMessages.isEmpty
-                ? Align(
-                    alignment: Alignment.center,
-                    child: ShortcutPanel(),
-                  )
-                : ListView.separated(
-                    controller: appState.messagesScrollController,
-                    itemCount: allMessages.length,
-                    itemBuilder: (context, index) {
-                      return MessagePanel(
-                        message: allMessages[index]!,
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return allMessages[index]!.isUser
-                          ? Container()
-                          : Container(
-                              height: 1,
-                              color: JarvisTheme.brighterThanBackground,
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                            );
-                    },
+            child: Stack(
+              children: [
+                allMessages.isEmpty
+                    ? Align(
+                        alignment: Alignment.center,
+                        child: ShortcutPanel(),
+                      )
+                    : ListView.separated(
+                        controller: appState.messagesScrollController,
+                        itemCount: allMessages.length,
+                        itemBuilder: (context, index) {
+                          return MessagePanel(
+                            message: allMessages[index]!,
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return allMessages[index]!.isUser
+                              ? Container()
+                              : Container(
+                                  height: 1,
+                                  color: JarvisTheme.brighterThanBackground,
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                );
+                        },
+                      ),
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: chatState.attachments
+                        .map(
+                          (attachment) => ImagePanel(
+                            attachment,
+                            onRemove: () {
+                              chatState.attachments.remove(attachment);
+                              setState(() {});
+                            },
+                          ),
+                        )
+                        .toList(),
                   ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           PromptPanel(),
