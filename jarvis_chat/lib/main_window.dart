@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:jarvis_chat/jarvis_theme.dart';
 import 'package:jarvis_chat/main_page.dart';
 import 'package:jarvis_chat/state/chat_state.dart';
 import 'package:jarvis_chat/state/app_state.dart';
@@ -60,12 +61,12 @@ class _MainWindowState extends State<MainWindow>
       },
     );
 
-    Window.setEffect(
-      effect: WindowEffect.transparent,
-      color: Colors.transparent,
-      dark: true,
-    );
     if (Platform.isMacOS) {
+      Window.setEffect(
+        effect: WindowEffect.acrylic,
+        color: Colors.transparent,
+        dark: true,
+      );
       Window.overrideMacOSBrightness(
         dark: true,
       );

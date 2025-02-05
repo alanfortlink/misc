@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/window.dart';
 import 'package:flutter_acrylic/window_effect.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:jarvis_chat/jarvis_theme.dart';
 import 'package:jarvis_chat/main_window.dart';
 import 'package:jarvis_chat/state/chat_state.dart';
 import 'package:jarvis_chat/state/app_state.dart';
@@ -23,7 +24,9 @@ Future<void> main(List<String> args) async {
 
   await Highlighter.initialize(['dart']);
 
-  await Window.initialize();
+  if (Platform.isMacOS) {
+    await Window.initialize();
+  }
 
   await windowManager.ensureInitialized();
   WindowOptions windowOptions = WindowOptions(
@@ -32,7 +35,8 @@ Future<void> main(List<String> args) async {
       store.lastHeight.toDouble(),
     ),
     center: false,
-    backgroundColor: Colors.transparent,
+    backgroundColor:
+        Platform.isMacOS ? Colors.transparent : JarvisTheme.backgroundColor,
     skipTaskbar: Platform.isMacOS,
     titleBarStyle:
         Platform.isMacOS ? TitleBarStyle.hidden : TitleBarStyle.normal,

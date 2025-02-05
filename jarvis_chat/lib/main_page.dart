@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:jarvis_chat/image_panel.dart';
 import 'package:jarvis_chat/jarvis_theme.dart';
@@ -25,8 +27,11 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
+    final bgColor =
+        Platform.isMacOS ? Colors.transparent : JarvisTheme.backgroundColor;
+
     return MaterialApp(
-      color: Colors.transparent,
+      color: bgColor,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.green,
@@ -38,7 +43,7 @@ class _MainPageState extends State<MainPage> {
         child: ChangeNotifierProvider.value(
           value: widget.chatState,
           child: Scaffold(
-            backgroundColor: Colors.transparent,
+            backgroundColor: bgColor,
             body: MainPanel(),
           ),
         ),
