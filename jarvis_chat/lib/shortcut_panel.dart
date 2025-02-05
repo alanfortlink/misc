@@ -22,12 +22,12 @@ class ShortcutPanel extends StatelessWidget {
       ShortcutInfo("$keyboardKey + L", "Clear Messages"),
       ShortcutInfo("$keyboardKey + C", "Clear Attachments"),
       ShortcutInfo("$keyboardKey + ;", "Toggle Details"),
-      ShortcutInfo("$keyboardKey + U", "Scroll ⬆︎"),
-      ShortcutInfo("$keyboardKey + D", "Scroll ⬇︎"),
+      ShortcutInfo("$keyboardKey + U", "Scroll Up"),
+      ShortcutInfo("$keyboardKey + D", "Scroll Down"),
       ShortcutInfo("$keyboardKey + S", "Stop Response"),
       ShortcutInfo("$keyboardKey + ,", "Open Settings"),
       ShortcutInfo("$keyboardKey + /", "Switch between ollama / openai"),
-      ShortcutInfo("$keyboardKey + ⇧ + ,", "Show/Hide window"),
+      ShortcutInfo("$keyboardKey + Shift + ,", "Show/Hide window"),
       ShortcutInfo("/code or /image", "Prefix for /code and /image models"),
     ];
 

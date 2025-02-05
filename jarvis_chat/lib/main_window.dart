@@ -88,6 +88,11 @@ class _MainWindowState extends State<MainWindow>
   }
 
   @override
+  void onTrayIconRightMouseDown() async {
+    trayManager.popUpContextMenu();
+  }
+
+  @override
   void onTrayMenuItemClick(MenuItem menuItem) async {
     if (menuItem.key == "open_chat") {
       _showWindow();
