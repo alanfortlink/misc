@@ -35,7 +35,7 @@ class _MainWindowState extends State<MainWindow>
   }
 
   void _toggle() async {
-    if (await windowManager.isVisible()) {
+    if (await windowManager.isFocused()) {
       _hideWindow();
     } else {
       _showWindow();
