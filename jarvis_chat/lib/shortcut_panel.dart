@@ -86,7 +86,9 @@ class ShortcutPanel extends StatelessWidget {
                     child: Text(
                       shortcut.description,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: Colors.white.withValues(
+                          alpha: 0.4,
+                        ),
                         fontSize: 13,
                       ),
                     ),

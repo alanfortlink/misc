@@ -94,10 +94,10 @@ class _MainPanelState extends State<MainPanel> {
                                 "No messages yet",
                                 style: TextStyle(
                                   color: JarvisTheme.textColor,
-                                  fontSize: 20.0,
+                                  fontSize: 16.0,
                                 ),
                               ),
-                              const SizedBox(height: 32),
+                              const SizedBox(height: 40),
                               ShortcutPanel(),
                             ],
                           ),
