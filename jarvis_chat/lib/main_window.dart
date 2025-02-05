@@ -63,7 +63,7 @@ class _MainWindowState extends State<MainWindow>
 
     if (Platform.isMacOS) {
       Window.setEffect(
-        effect: WindowEffect.acrylic,
+        effect: WindowEffect.aero,
         color: Colors.transparent,
         dark: true,
       );

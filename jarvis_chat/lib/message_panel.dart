@@ -46,7 +46,7 @@ class _MessagePanelState extends State<MessagePanel> {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: widget.message.isUser
-                ? JarvisTheme.brighterThanBackground
+                ? JarvisTheme.muchBrighterThanBackground
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),

@@ -327,25 +327,16 @@ class _PromptPanelState extends State<PromptPanel> {
         Container(
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-            color: JarvisTheme.brighterThanBackground.withValues(
-              alpha: 0.8,
+            color: JarvisTheme.muchBrighterThanBackground.withValues(
+              alpha: 0.7,
             ),
             borderRadius: BorderRadius.circular(16.0),
             border: Border.all(
               color: JarvisTheme.muchBrighterThanBackground.withValues(
-                alpha: 0.8,
+                alpha: 0.9,
               ),
               width: 1.0,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.white.withValues(
-                  alpha: 0.1,
-                ),
-                blurRadius: 2.0,
-                offset: const Offset(0, 0),
-              ),
-            ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.max,
