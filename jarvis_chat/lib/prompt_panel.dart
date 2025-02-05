@@ -327,10 +327,14 @@ class _PromptPanelState extends State<PromptPanel> {
         Container(
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-            color: JarvisTheme.brighterThanBackground,
+            color: JarvisTheme.brighterThanBackground.withValues(
+              alpha: 0.4,
+            ),
             borderRadius: BorderRadius.circular(16.0),
             border: Border.all(
-              color: JarvisTheme.muchBrighterThanBackground,
+              color: JarvisTheme.muchBrighterThanBackground.withValues(
+                alpha: 0.4,
+              ),
               width: 1.0,
             ),
           ),
@@ -347,7 +351,9 @@ class _PromptPanelState extends State<PromptPanel> {
                   autofocus: true,
                   canRequestFocus: true,
                   style: TextStyle(
-                    color: JarvisTheme.brighterTextColor,
+                    color: JarvisTheme.brighterTextColor.withValues(
+                      alpha: 0.99,
+                    ),
                     fontSize: 14.0,
                   ),
                   onChanged: _onPromptChanged,
@@ -363,7 +369,9 @@ class _PromptPanelState extends State<PromptPanel> {
               Container(
                   padding: const EdgeInsets.all(4.0),
                   decoration: BoxDecoration(
-                    color: Color(0xFFE0E0E0),
+                    color: Color(0xFFE0E0E0).withValues(
+                      alpha: 0.9,
+                    ),
                     shape: BoxShape.circle,
                   ),
                   child: isCheckingConnection

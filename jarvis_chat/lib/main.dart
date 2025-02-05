@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_acrylic/window.dart';
+import 'package:flutter_acrylic/window_effect.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:jarvis_chat/main_window.dart';
 import 'package:jarvis_chat/state/chat_state.dart';
@@ -19,6 +22,8 @@ Future<void> main(List<String> args) async {
   await chatState.init(store);
 
   await Highlighter.initialize(['dart']);
+
+  await Window.initialize();
 
   await windowManager.ensureInitialized();
   WindowOptions windowOptions = WindowOptions(

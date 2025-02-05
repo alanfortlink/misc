@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:jarvis_chat/main_page.dart';
 import 'package:jarvis_chat/state/chat_state.dart';
@@ -58,6 +59,17 @@ class _MainWindowState extends State<MainWindow>
         _toggle();
       },
     );
+
+    Window.setEffect(
+      effect: WindowEffect.transparent,
+      color: Colors.transparent,
+      dark: true,
+    );
+    if (Platform.isMacOS) {
+      Window.overrideMacOSBrightness(
+        dark: true,
+      );
+    }
   }
 
   Future<void> saveWindowState() async {

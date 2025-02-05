@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
 class JarvisTheme {
-  static const Color backgroundColor = Color(0xDD2D2D2D);
+  static const Color backgroundColor = Colors.transparent;
   static const Color darkerThanBackground = Color(0xFF1F1F1F);
   static const Color brighterThanBackground = Color(0xDD3C3C3C);
   static const Color muchBrighterThanBackground = Color(0xFF4F4F4F);
