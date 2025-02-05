@@ -28,6 +28,7 @@ class _MainWindowState extends State<MainWindow>
   void _showWindow() async {
     await windowManager.show();
     await windowManager.focus();
+    widget.store.promptFocusNode.requestFocus();
   }
 
   void _hideWindow() async {

@@ -329,6 +329,10 @@ class _PromptPanelState extends State<PromptPanel> {
           decoration: BoxDecoration(
             color: JarvisTheme.brighterThanBackground,
             borderRadius: BorderRadius.circular(16.0),
+            border: Border.all(
+              color: JarvisTheme.muchBrighterThanBackground,
+              width: 1.0,
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.max,
@@ -348,42 +352,58 @@ class _PromptPanelState extends State<PromptPanel> {
                   ),
                   onChanged: _onPromptChanged,
                   decoration: InputDecoration(
-                    hintText: "Prompt...",
+                    hintText: appState.useOpenAI
+                        ? "Prompt (openai)..."
+                        : "Prompt (ollama)...",
                     border: InputBorder.none,
                     fillColor: Colors.white,
                   ),
                 ),
               ),
-              isCheckingConnection
-                  ? Container(
-                      width: 24.0,
-                      height: 24.0,
-                      child: CircularProgressIndicator(
-                        color: Colors.white.withValues(
-                          alpha: 0.5,
-                        ),
-                      ),
-                    )
-                  : (!appState.serverUp)
-                      ? IconButton(
-                          icon: Icon(Icons.cloud_off),
-                          onPressed: () async {
-                            appState.serverUp =
-                                await chatState.checkConnection(appState);
-                            setState(() {});
-                          },
+              Container(
+                  padding: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE0E0E0),
+                    shape: BoxShape.circle,
+                  ),
+                  child: isCheckingConnection
+                      ? Container(
+                          width: 40.0,
+                          height: 40.0,
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(
+                            color: JarvisTheme.darkerThanBackground,
+                          ),
                         )
-                      : chatState.incoming == null
+                      : (!appState.serverUp)
                           ? IconButton(
                               icon: Icon(
-                                appState.useOpenAI ? Icons.wifi : Icons.send,
+                                Icons.cloud_off,
+                                color: JarvisTheme.darkerThanBackground,
                               ),
-                              onPressed: _onPromptSubmitted,
+                              onPressed: () async {
+                                appState.serverUp =
+                                    await chatState.checkConnection(appState);
+                                setState(() {});
+                              },
                             )
-                          : IconButton(
-                              icon: Icon(Icons.stop),
-                              onPressed: _stopPrompt,
-                            )
+                          : chatState.incoming == null
+                              ? IconButton(
+                                  icon: Icon(
+                                    appState.useOpenAI
+                                        ? Icons.arrow_upward
+                                        : Icons.send_rounded,
+                                    color: JarvisTheme.darkerThanBackground,
+                                  ),
+                                  onPressed: _onPromptSubmitted,
+                                )
+                              : IconButton(
+                                  icon: Icon(
+                                    Icons.stop,
+                                    color: JarvisTheme.darkerThanBackground,
+                                  ),
+                                  onPressed: _stopPrompt,
+                                )),
             ],
           ),
         ),

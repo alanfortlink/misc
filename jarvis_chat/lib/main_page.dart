@@ -72,7 +72,7 @@ class _MainPanelState extends State<MainPanel> {
           colors: [
             JarvisTheme.backgroundColor,
             JarvisTheme.backgroundColor.withValues(
-              alpha: 0.9,
+              alpha: 0.99,
             ),
           ],
         ),
