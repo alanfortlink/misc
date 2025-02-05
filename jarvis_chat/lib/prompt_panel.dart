@@ -327,7 +327,7 @@ class _PromptPanelState extends State<PromptPanel> {
         Container(
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
-            color: JarvisTheme.darkerThanBackground,
+            color: JarvisTheme.brighterThanBackground,
             borderRadius: BorderRadius.circular(16.0),
           ),
           child: Row(
@@ -343,7 +343,8 @@ class _PromptPanelState extends State<PromptPanel> {
                   autofocus: true,
                   canRequestFocus: true,
                   style: TextStyle(
-                    color: JarvisTheme.textColor,
+                    color: JarvisTheme.brighterTextColor,
+                    fontSize: 14.0,
                   ),
                   onChanged: _onPromptChanged,
                   decoration: InputDecoration(

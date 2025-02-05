@@ -22,7 +22,7 @@ class OpenAIClient extends LLMClientBase {
   Map<String, Object?> parseMessage(ChatMessage? message) {
     if (message == null) {
       return {
-        "role": "developer",
+        "role": "system",
         "content": """You are an assistant for a good software engineer. 
 Prefer to use simple and short answers. 
 Do not explain too much, unless it is explicitly requested.

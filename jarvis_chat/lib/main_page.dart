@@ -37,7 +37,6 @@ class _MainPageState extends State<MainPage> {
         child: ChangeNotifierProvider.value(
           value: widget.chatState,
           child: Scaffold(
-            backgroundColor: JarvisTheme.backgroundColor,
             body: MainPanel(),
           ),
         ),
@@ -65,7 +64,19 @@ class _MainPanelState extends State<MainPanel> {
     ];
 
     return Container(
-      margin: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            JarvisTheme.backgroundColor,
+            JarvisTheme.backgroundColor.withValues(
+              alpha: 0.9,
+            ),
+          ],
+        ),
+      ),
       child: Column(
         children: [
           Expanded(
@@ -105,7 +116,7 @@ class _MainPanelState extends State<MainPanel> {
                               ? Container()
                               : Container(
                                   height: 1,
-                                  color: JarvisTheme.brighterThanBackground,
+                                  color: JarvisTheme.muchBrighterThanBackground,
                                   margin:
                                       const EdgeInsets.symmetric(vertical: 8),
                                 );
