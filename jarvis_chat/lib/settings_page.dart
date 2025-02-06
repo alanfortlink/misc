@@ -74,6 +74,15 @@ class _SettingsPageState extends State<SettingsPage> {
     if (value.isEmpty) {
       return "";
     }
+
+    if (value.length <= 4) {
+      return "*" * value.length;
+    }
+
+    if (value.length <= 10) {
+      return "*" * value.length;
+    }
+
     return value.substring(0, 2) +
         "*" * (value.length - 4) +
         value.substring(value.length - 2);
