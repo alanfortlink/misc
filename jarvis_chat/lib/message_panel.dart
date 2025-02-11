@@ -5,6 +5,7 @@ import 'package:jarvis_chat/llm/llm_client_base.dart';
 import 'package:jarvis_chat/markdown_code_block_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_markdown/flutter_markdown.dart' as md;
+import 'package:url_launcher/url_launcher.dart';
 import 'state/app_state.dart';
 
 class MessagePanel extends StatefulWidget {
@@ -30,6 +31,15 @@ class _MessagePanelState extends State<MessagePanel> {
 
   Future<void> _init() async {
     _markdownCodeBlockBuilder.init();
+  }
+
+  void _launch(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      print("Could not launch $url");
+    }
   }
 
   @override
@@ -66,6 +76,11 @@ class _MessagePanelState extends State<MessagePanel> {
                       ),
                     )
                   : md.MarkdownBody(
+                      onTapLink: (text, href, title) {
+                        if (href != null) {
+                          _launch(href);
+                        }
+                      },
                       softLineBreak: true,
                       builders: {
                         "pre": _markdownCodeBlockBuilder,
