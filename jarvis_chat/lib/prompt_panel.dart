@@ -325,10 +325,15 @@ class _PromptPanelState extends State<PromptPanel> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.only(
+            left: 16.0,
+            right: 16.0,
+            top: 8.0,
+            bottom: 8.0,
+          ),
           decoration: BoxDecoration(
             color: JarvisTheme.muchBrighterThanBackground.withValues(
-              alpha: 0.7,
+              alpha: 0.3,
             ),
             borderRadius: BorderRadius.circular(16.0),
             border: Border.all(
@@ -354,7 +359,7 @@ class _PromptPanelState extends State<PromptPanel> {
                     color: JarvisTheme.brighterTextColor.withValues(
                       alpha: 0.99,
                     ),
-                    fontSize: 14.0,
+                    fontSize: 12.0,
                   ),
                   onChanged: _onPromptChanged,
                   decoration: InputDecoration(
@@ -367,10 +372,10 @@ class _PromptPanelState extends State<PromptPanel> {
                 ),
               ),
               Container(
-                  padding: const EdgeInsets.all(4.0),
+                  padding: const EdgeInsets.all(2.0),
                   decoration: BoxDecoration(
                     color: Color(0xFFE0E0E0).withValues(
-                      alpha: 0.9,
+                      alpha: 0.8,
                     ),
                     shape: BoxShape.circle,
                   ),

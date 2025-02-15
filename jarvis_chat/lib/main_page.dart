@@ -74,6 +74,13 @@ class _MainPanelState extends State<MainPanel> {
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: JarvisTheme.backgroundColor,
+        border: Border.all(
+          color: JarvisTheme.muchBrighterThanBackground.withValues(
+            alpha: 0.5,
+          ),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(16),
         // gradient: LinearGradient(
         //   begin: Alignment.topLeft,
         //   end: Alignment.bottomRight,
